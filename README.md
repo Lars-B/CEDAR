@@ -68,10 +68,11 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
 
 - Creating random taxa orders:
   ```
-  python src/CEDAR.py orders --input_file CEDAR_file --output_dir out_dir [--nb_orders N] [--output_prefix out_pref]
+  python src/CEDAR.py orders --input_file CEDAR_file --output_dir out_dir [--nb_orders N] [--output_prefix out_pref] [--seed seed]
   ```
   Creates `N` random taxa orders in files `out_dir/out_pref_I.txt` for `I` from `1` to `N`.
-  Default values: `N=1`, `out_pref=CEDAR_random_order`.
+  Parameter `seed` is the seed of the random generator.
+  Default values: `N=1`, `out_pref=CEDAR_random_order`, `seed=0`.
 
   **Assumption**: in all commands, all trees in a `CEDAR_file` are rooted phylogenetic trees on the same set of taxa
   and having been encoded into vector using the same order on taxa, written in the first line of the file.
@@ -107,10 +108,18 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
 
 - Computing HOP paths between successive trees:
   ```
-  python src/CEDAR.py HOP_path --input_file CEDAR_file --output_file CEDAR_path_file
+  python src/CEDAR.py HOP_path --input_file CEDAR_file --output_file CEDAR_path_file --mode sequence
   ```
   Creates a new CEDAR file where a sequence of trees, each differing from the previous one by a single
   HOP, is inserted between all pairs of successive trees in the input file `CEDAR_file`.
+
+- Peforming a random HOP to each tree
+  ```
+  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed seed]
+  ```
+  Creates a new CEDAR file containing on each line a tree differing by a single random HOP from the tree
+  in the same line in the input file.
+  Parameter `seed` is the seed of the random generator and has default value `0`.
 
 ## Class TreeVec
 
@@ -132,5 +141,5 @@ The main methods of the class, aside of the constuctor, are:
 - `hop_neighbourhood`: computes the `TreeVec` representations of the trees in the HOP neighbourhood of the tree encoded by the object;
 - `hop_similarity`: computes the HOP similarity or a HOP LCS (see paper for an explanation) with another tree;
 - `hop_next`: creates a tree one HOP closer to a target tree;
-- `random_hop`: peform a random HOP on the current tree.
+- `random_hop`: peform a uniform random HOP on the current tree.
 

@@ -6,14 +6,14 @@ TreeVec class for vector representation of a tree
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
 
 from ete3 import Tree
 from LIS import LIS_len, LIS_seq
-from random import randint
+from numpy import random
 
 # Separator between a label and a node name in a tree representation
 SEP_NODE = ":"
@@ -313,72 +313,104 @@ class TreeVec:
         tree = Tree(newick_str, format=1)
         return self.tree2treevec(tree, leaf2idx=leaf2idx)
 
-    # Hop-related functions
-            
+    """ Hop-related functions
+    A hop is an SPR, so a subtree is pruned then regrafted.
+    Not every SPR is a hop as the following restriction applies to hop:
+    if a is the smallest (in the leaves order associated to a tree) leaf in the pruned subtree,
+    it can only be regrafted on an edge on one of the LTSv paths for leaves 1 to a-1.
+
+    In terms of vector encoding, a hop is as follows:
+    - pruning: removing the first occurrence of some label a > 1: this element corresponds to the
+      unique internal node labelled by a and the pruned subtree is rooted at its child on the path
+      to the leaf a; 
+    - regrafting: inserting it anywhere between the first occurrence of 1 and the second occurrence 
+      of a-1; if it is inserted before an element labelled by b, then the pruned subtree is regrafted
+      on the branch from the corresponding node labelled b to its parent.
+    Branch lengths are modified as follows: the branch created by the pruning has length equal to 
+    the sum of the two branches defining it, while the branch where the prune subtree is regrafted 
+    leads to wo branches with length half the length of the initial branch.
+    
+    In terms of implementation, pruning is implemented using the pop function and regrafting using 
+    the insert function, both functions applying on python lists.
+
+    Internally, a hop is encoded with a pair (i,j) where:
+    - i>0 is the position in self.vector of the popped element (labeled a);
+    - j is the position in self.vector where the popped element will be inserted;
+    both positions are in 0-index.
+
+    By definition of the vector encoding, if the second ocurrence of a-1 is in position k, then
+    i<k and j must satisfy j<k. So j must be in [1,k]. Pairs that do not define a new tree and
+    must be excluded are
+    - j=i so (i,i)
+    - j=i+1 so (i,i+1)
+    - j=i+2 if i+1 is not a leaf as (i,i+2) is equivalent to (i+1,i)
+ 
+    """
+     
     def __hop_update_dist(self, v, i, j, x, y, z):
         """
-        Update the brach lengths of a vector representation after
-        having done a hop
+        Update the branch lengths of a vector representation after having done a hop
+        i: position in vector of node whose branch to parent was subdivided by the pruning 
+           (pruned subree root sibling)
+        j: position in vector of node whose branch to parent contains the regrafting 
+           (regrafting node)
+           implies that j-1 is the position of its parent, the new node created by regrafing
+        x: length of branch from pruned subtree root sibling to parent
+        y: length of branch from pruned subtree root parent to parent
+        z: length of branch from regrafting node to parent
         """
         v[i][2] = x+y
         v[j-1][2] = z/2
         v[j][2] = z/2
-        
-    def __hop_inplace(self, i, j):
-        """
-        Modify self.vector by a hop of element in position i moved before
-        element in position j
-        Index in 0-base
-        Input:
-        - i,j (int)
-        WARNING: does not check i and j define a hop leading to a valid tree
-        representation
-        """
-        v = self.vector
-        if i < j-1:
-            x,y,z = v[i+1][2],v[i][2],v[j][2]
-            k = v.pop(i)
-            v.insert(j-1,k)
-            self.__hop_update_dist(v,i,j,x,y,z)
-        elif i >= j+1:
-            x,y,z = v[i+1][2],v[i][2],v[j][2]
-            k = v.pop(i)
-            v.insert(j,k)
-            self.__hop_update_dist(v,i+1,j+1,x,y,z)
-        
+
     def __hop_init(self, i, j):
         """
-        Create a new TreeVec object from s by a hop of element in position i moved
-        before element in position j
-        Indexed in 0-base
+        Create a new TreeVec object by a hop (i,j)
         Input:
-        - i,j (int)
+        - i,j (int): hop coordinates
         WARNING: does not check i and j define a valid hop
         """
         v = self.copy().vector
         new_v = []
-        if i < j-1:
-            x,y,z = v[i+1][2],v[i][2],v[j][2]
+        x,y,z = v[i+1][2],v[i][2],v[j][2]
+        if j <= i-1:
+            new_v = v[0:j]+[v[i]]+v[j:i]+v[i+1:]
+            self.__hop_update_dist(new_v,i+1,j+1,x,y,z)        
+        elif j > i+1:
             new_v = v[0:i]+v[i+1:j]+[v[i]]+v[j:]
             self.__hop_update_dist(new_v,i,j,x,y,z)
-        elif i >= j+1:
-            x,y,z = v[i+1][2],v[i][2],v[j][2]
-            new_v = v[0:j]+[v[i]]+v[j:i]+v[i+1:]
-            self.__hop_update_dist(new_v,i+1,j+1,x,y,z)
+
         return TreeVec(treevec_vec=new_v)
+        
+    def __hop_inplace(self, i, j):
+        """
+        Modify self.vector by a hop (i,j)
+        Input:
+        - i,j (int): hop coordinates
+        WARNING: does not check i and j define a hop leading to a valid tree
+        representation
+        """
+        v = self.vector
+        pruned_subtree = v.pop(i)
+        x,y,z = v[i+1][2],v[i][2],v[j][2]
+        if j <= i-1:
+            v.insert(j,pruned_subtree)
+            self.__hop_update_dist(v,i+1,j+1,x,y,z)
+        elif j > i+1:
+            v.insert(j-1,pruned_subtree)
+            self.__hop_update_dist(v,i,j,x,y,z)
 
     def hop(self, i, j, inplace=False):
         """
-        Implement e hop rearrangement by moving element in position i before position j
-        Index in 0-base
+        Implement the hop rearrangement (i,j)
         Input:
-        - i,j (int)
+        - i,j (int): hop coordinates
         - inplace (bool): if True modifies the current object oherwise returns a new object
         WARNING: does not check i and j define a hop leading to a valid tree
         representation
         """
         v = self.vector
-        if not (i>0 and j>0 and (i<j-1 or i>=j+1) and (not v[i][3])):
+        if not (i>0 and j>0 and (j<=i-1 or j>i+1) and (not v[i][3])):
             raise Exception("ERROR: improper HOP coordinates")
         if inplace:
             self.__hop_inplace(i, j)
@@ -386,27 +418,51 @@ class TreeVec:
         else:
             return self.__hop_init(i, j)
 
+    def _compute_leaves_positions(self):
+        """
+        Computes a dictionary leafpos that records he position in the 
+        vector of the second occurrence of each label
+        """
+        v = self.vector
+        leafpos = {}
+        for k in range(1,len(v)):
+            node = v[k]
+            if node[3]:
+                leafpos[node[0]] = k
+        return leafpos
+
+    def _compute_hops_range(self, i, k, size=False):
+        """
+        Compute the number/set of positions elment in position i can be moved to by a hop
+        if size=True: count number of positions, otherwise cmpute the set of positions
+        """
+        range_j = list(range(1,k+1)) # 1 to exclude first position 0
+        # excluding (i,i)
+        range_j.remove(i)
+        # excluding (i,i+1) if i+1 in the range of possible hops
+        if i+1 <= k:
+            range_j.remove(i+1)
+        # excluding (i,i+2) if i+2 in the range of possible hops and v[i+1] not a leaf
+        # as it is equivalent to (i+1,i) that will not be excluded
+        if i+2<=k and not self.vector[i+1][3]:
+            range_j.remove(i+2)
+        return len(list(range_j)) if size else range_j
+
     def hop_neighbourhood_size(self):
         """
         Compute the size of the hop neighbourhood of a tree
         - Output: (int), neighbourhood size
         """
-        v = self.vector
-        leafpos = {}
+        leafpos = self._compute_leaves_positions()
         ngb_size = 0
-        for j in range(1,len(v)):
-            node = v[j]
-            if node[3]:
-                leafpos[node[0]] = j
-        for j in range(1,len(v)):
-            node = v[j]
-            if not node[3]:
-                k = leafpos[node[0]-1]
-                ngb_size += k-1 # -1 to exclude (j,j)
-                if j+1 <= k: ngb_size -= 1 # to exclude (j,j+1)
-                if j+2 <= k: ngb_size -= 1 # to exclude (j,j+2)
+        for i in range(1,len(self.vector)):
+            moved_node = self.vector[i]
+            if not moved_node[3]:
+                # k: position of second occurrence of a-1 if moved_node has label a
+                k = leafpos[moved_node[0]-1]
+                ngb_size += self._compute_hops_range(i, k, size=True)
         return ngb_size
-
+        
     def hop_neighbourhood(self, export_list=False):
         """
         Compute the hop neighbourhood of a tree
@@ -414,26 +470,48 @@ class TreeVec:
         if export_list is False: list(TreeVec)
         else: list((int,int)), list of HOP defining the neighbourhood
         """
-        v = self.vector                
-        leafpos = {}
+        leafpos = self._compute_leaves_positions()        
         ngb = []
-        for j in range(1,len(v)):
-            node = v[j]
-            if node[3]:
-                leafpos[node[0]] = j
-        for j in range(1,len(v)):
-            node = v[j]
-            if not node[3]:
-                k = leafpos[node[0]-1]
-                range_k = list(range(1,k+1)) # 1 to exclude first position 0
-                range_k.remove(j)
-                if j+1 <= k: range_k.remove(j+1)
-                if j+2 <= k: range_k.remove(j+2)
-                if export_list:
-                    ngb += range_k
-                else:
-                    ngb += [self.hop(j,k1, inplace=False) for k1 in range_k]
+        for i in range(1,len(self.vector)):
+            moved_node = self.vector[i]
+            if not moved_node[3]:
+                k = leafpos[moved_node[0]-1]
+                range_j = list(self._compute_hops_range(i, k, size=False))
+                ngb += range_j if export_list else [
+                    self.hop(i,j, inplace=False) for j in range_j
+                ]
         return ngb
+    
+    def random_hop(self, seed=0, inplace=False):
+        """
+        Computes a new TreeVec representing a tree differing from self by a single random hop
+        under the uniform distribution.
+        Input:
+        - seed: random generator seed
+        - inplace(bool): If True modifies the curren object, otherwise returns a new object
+        Output:
+        - TreeVec
+        """
+        # Number of possible random hops
+        hop_ngb_size = self.hop_neighbourhood_size()
+        # Index of the hop to apply
+        rng = random.default_rng(seed)
+        hop_rank = rng.integers(1,high=hop_ngb_size+1)
+        leafpos = self._compute_leaves_positions()
+        # Number of possible hops already considered
+        nb_hops = 0
+        for i in range(1,len(self.vector)):
+            candidate_moved_node = self.vector[i]
+            if not candidate_moved_node[3]:
+                k = leafpos[candidate_moved_node[0]-1]
+                range_j = list(self._compute_hops_range(i, k, size=False))
+                nb_possible_hops = len(range_j)
+                if  nb_possible_hops >= hop_rank:                    
+                    j = range_j[hop_rank-1]
+                    return self.hop(i, j, inplace=inplace)
+                else:
+                    nb_hops += nb_possible_hops
+                    hop_rank -= nb_possible_hops
 
     # Hop-similarity related functions    
 
@@ -537,28 +615,3 @@ class TreeVec:
         while not __equal(y,v1[j]): j+=1
         # Move x after y
         return self.hop(i,j+1, inplace=inplace)
-
-    def random_hop(self, inplace=False):
-        """
-        Computes a new TreeVec representing a tree differing
-        from self by a single random hop
-        Input:
-        - inplace(bool): If True modifies the curren object, otherwise returns a new object
-        Output:
-        - TreeVec
-        """
-        v = self.vector
-        n = len(v)
-        # Selecting the element to move: internal node
-        i = random.randint(1,n-2)
-        while v[i][3]:
-            i = random.randint(1,n-2)
-        vi = v[i][0]
-        # Selecting the positin where to move it
-        j = random.randint(1,n-2)
-        while (v[j][0] > vi-1 or i in [j-1,j]):
-            j = random.randint(1,n-2)
-        # Proceed with the hop
-        return self.hop(i, j, inplace=inplace)
-
-        

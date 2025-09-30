@@ -5,7 +5,7 @@ CEDAR: manipulating phylogenetic rooted trees representations as vectors
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
@@ -13,7 +13,6 @@ __status__ = "Release"
 import os
 import sys
 import argparse
-from numpy import random
 import numpy as np
 
 from TreeVec import TreeVec
@@ -71,7 +70,7 @@ def read_leaves_order_file(in_leaves_order_file, sep=SEP_ORDER):
     leaf2idx,idx2leaf = str2order(line, sep=sep)
     return leaf2idx,idx2leaf
 
-def random_leaves_order(in_TreeVec_file, nb_orders=1, out_file_prefix="leaves_order"):
+def random_leaves_order(in_TreeVec_file, nb_orders=1, in_seed=0, out_file_prefix="leaves_order"):
     """
     Generates nb_orders random leaves orders and write them in files 
     {out_prefix_file}_{nb order}.txt
@@ -79,8 +78,9 @@ def random_leaves_order(in_TreeVec_file, nb_orders=1, out_file_prefix="leaves_or
     _,_,idx2leaf = __read_TreeVec_file(in_TreeVec_file)
     nb_leaves = len(idx2leaf.keys())
     idx = np.array(list(idx2leaf.values()))
+    rng = np.random.default_rng(in_seed)
     for i in range(1,nb_orders+1):
-        random.shuffle(idx)
+        rng.shuffle(idx)
         _idx2leaf = {j: idx[j-1] for j in range(1,nb_leaves+1)}
         with open(f"{out_file_prefix}_{i}.txt", "w") as out_file:
             out_file.write(f"{order2str(_idx2leaf)}\n")
@@ -267,6 +267,17 @@ def hop_path(in_TreeVec_file, out_TreeVec_file):
             j += 1
     __write_TreeVec_file(out_TreeVec_trees, idx2leaf, out_TreeVec_file)
 
+def hop_random(in_TreeVec_file, out_TreeVec_file, in_seed):
+    """
+    Given a file of TreeVec trees, performs a random hop to each tree
+    """
+    in_TreeVec_trees,leaf2idx,idx2leaf = __read_TreeVec_file(in_TreeVec_file)
+    out_TreeVec_trees = []
+    for TreeVec_tree in in_TreeVec_trees:
+        new_TreeVec_tree = TreeVec_tree.random_hop(seed=in_seed, inplace=False)
+        out_TreeVec_trees.append(new_TreeVec_tree)
+    __write_TreeVec_file(out_TreeVec_trees, idx2leaf, out_TreeVec_file)
+
 def _parse_arguments():
     description = "CEDAR: manipulating phylogenetic rooted trees representations as vectors"
 
@@ -294,7 +305,8 @@ def _parse_arguments():
     orders.add_argument("--input_file", type=str, help="Input CEDAR file")
     orders.add_argument("--output_dir", type=str, help="Output directory")
     orders.add_argument("--nb_orders", type=int, default=1, help="[OPTIONAL] Number of random orders to generate (default=1)")
-    orders.add_argument("--output_prefix", type=str, default="CEDAR_random_order", help="[OPTIONAL] Prefix of random order files")    
+    orders.add_argument("--output_prefix", type=str, default="CEDAR_random_order", help="[OPTIONAL] Prefix of random order files")
+    orders.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random generator seed")
 
     # Computing the HOP similarity between trees
     hop_sim = subparsers.add_parser("HOP_sim", help="HOP similarity between trees")
@@ -322,6 +334,13 @@ def _parse_arguments():
     hop_path.add_argument("--input_file", type=str, help="Input CEDAR file")
     hop_path.add_argument("--output_file", type=str, help="Output CEDAR file")
 
+    # Computing a random HOP for each tree of a file
+    hop_random = subparsers.add_parser("HOP_random", help="Create new trees by applying a rando HOP to each input trees")
+    hop_random.set_defaults(cmd="HOP_random")
+    hop_random.add_argument("--input_file", type=str, help="Input CEDAR file")
+    hop_random.add_argument("--output_file", type=str, help="Output CEDAR file")
+    hop_random.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random generator seed")
+
     return argparser.parse_args()
 
 def fromNewick(args):
@@ -342,6 +361,7 @@ def orders(args):
     random_leaves_order(
         args.input_file,
         nb_orders=args.nb_orders,
+        in_seed=args.seed,
         out_file_prefix=os.path.join(args.output_dir,args.output_prefix)
     )
 
@@ -371,6 +391,14 @@ def HOP_path(args):
         args.input_file,
         args.output_file
     )
+
+def HOP_random(args):
+    hop_random(
+        args.input_file,
+        args.output_file,
+        in_seed=args.seed
+    )
+    
     
 def main(args):
     
@@ -394,6 +422,9 @@ def main(args):
 
     elif args.cmd == "HOP_path":
         HOP_path(args)
+
+    elif args.cmd == "HOP_random":
+        HOP_random(args)
         
     else:
         raise Exception("ERROR: Unknown command")
