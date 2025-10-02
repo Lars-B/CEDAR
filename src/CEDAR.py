@@ -16,6 +16,7 @@ import argparse
 import numpy as np
 
 from TreeVec import TreeVec
+from TreeSpace import hill_climbing
 
 # Auxiliary functions for manipulating leaves orders
 
@@ -341,6 +342,18 @@ def _parse_arguments():
     hop_random.add_argument("--output_file", type=str, help="Output CEDAR file")
     hop_random.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random generator seed")
 
+    # Hill-Climbing
+    hop_hc = subparsers.add_parser("HOP_hc", help="Hill-Climbing heuristic")
+    hop_hc.set_defaults(cmd="HOP_hc")
+    hop_hc.add_argument("--fasta_path", type=str, help="Input FASTA file")
+    hop_hc.add_argument("--DNA_model", type=str, help="Input DNA model for Raxml")
+    hop_hc.add_argument("--tree_folder_path", type=str, help="Path to folder where trees are written for Raxml (not created)")
+    hop_hc.add_argument("--tol", type=float, default=0.001, help="[OPTIONAL] Tolerance to dcide if a best tree has been found")
+    hop_hc.add_argument("--max_patience", type=int, default=5, help="[OPTIONAL] Max number of leaves reordering steps if no best neighbour is found")
+    hop_hc.add_argument("--max_nb_iterations", type=int, default=None, help="[OPTIONAL] Maximum number of iterations")
+    hop_hc.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random number generator seed")
+    hop_hc.add_argument("--out_file_path", type=str, help="Path to output file")
+
     return argparser.parse_args()
 
 def fromNewick(args):
@@ -398,7 +411,13 @@ def HOP_random(args):
         args.output_file,
         in_seed=args.seed
     )
-    
+
+def HOP_hc(args):
+    hill_climbing(
+        args.fasta_path, args.DNA_model, args.tree_folder_path,
+        args.tol, args.max_patience, args.max_nb_iterations, args.seed,
+        args.out_file_path
+    )
     
 def main(args):
     
@@ -425,6 +444,9 @@ def main(args):
 
     elif args.cmd == "HOP_random":
         HOP_random(args)
+
+    elif args.cmd == "HOP_hc":
+        HOP_hc(args)
         
     else:
         raise Exception("ERROR: Unknown command")

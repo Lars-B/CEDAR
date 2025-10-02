@@ -1,5 +1,5 @@
 """
-CEDAR-exploration: exploration of the tree space in a maximum likelihood framework
+CEDAR: exploration of the tree space in a maximum likelihood framework
 Running Raxml for tree space exploration
 Adapted from https://github.com/Neclow/phylo2vec/blob/main/py-phylo2vec/phylo2vec/opt/_hc_losses.py
 Accessed on 2025.09.30

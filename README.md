@@ -113,13 +113,39 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Creates a new CEDAR file where a sequence of trees, each differing from the previous one by a single
   HOP, is inserted between all pairs of successive trees in the input file `CEDAR_file`.
 
-- Peforming a random HOP to each tree
+- Peforming a random HOP to each tree in a file
   ```
-  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed seed]
+  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed random number generator seed]
   ```
   Creates a new CEDAR file containing on each line a tree differing by a single random HOP from the tree
   in the same line in the input file.
   Parameter `seed` is the seed of the random generator and has default value `0`.
+
+- Hill-climbig heuristic exploration of the tree space using HOPs:  
+  starting from a random tree, the heuristic iterates the following steps  
+  -compute the likelihood of all trees in the HOP neighbourhood of the current tree  
+  - select the highest likelihood tree  
+  - if its likelihood is within a given tolerance of the best tree so far:  
+    - reorder randomly leaves of the current tree and decrease a patience counter [patience step]  
+  - otherwise:  
+    - the best tree becomes the current tree  
+    - the patience counter is set to max_patience  
+  until the maximum number of iterations is reached or the patience counter is 0  
+
+  ```
+  python src/CEDAR.py HOP_hc --fasta_path FASTA_file --DNA_model DNA_model --tree_folder_path tree-folder_path \
+  	 	      	     --out_file_path out_file \
+                             [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
+			     [--seed sandom number generator seed]			     
+  ```	
+  All visited trees are recorded in the file `out_file` in format `<START,NEIGHBOUR,REORDER>,<likelihood score>,<Newick tree>`
+  where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where
+  the leaves order was randomly shuffled.
+  Parameter `seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.
+  Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).
+  Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and as default value `5`.
+  Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
+
 
 ## Class TreeVec
 

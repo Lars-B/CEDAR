@@ -1,5 +1,5 @@
 """
-CEDAR-exploration: exploration of the tree space in a maximum likelihood framework
+CEDAR: exploration of the tree space in a maximum likelihood framework
 """
 
 __author__ = "Cedric Chauve"
@@ -106,11 +106,25 @@ def best_ML_neighbour(current_tree, current_score, fasta_path, DNA_model, tree_f
     best_ngb_score = ngb_scores[best_score_idx]
     return best_ngb_tree,best_ngb_score
 
-def hill_climbing(
+def _write_tree(tree, score, prefix, out_file, sep=",", format="newick"):
+    """
+    Write "<prefix><sep><score><sep><tree>" in out_file
+    if format is "newick: write the newick tree
+    if format is "treevc" write in TreeVec format
+    """
+    if format == "newick":
+        tree_str = tree.treevec2newick()
+    elif format == "teevec":
+        tree_str = tree.treevec2str()
+    out_file.write(f"{prefix}{sep}{score}{sep}{tree_str}\n")    
+
+def _hill_climbing(
         fasta_path, DNA_model, tree_folder_path,
         first_tree, rng,
         tol, max_patience, max_nb_iterations,
-        out_file_path
+        out_file_path,
+        sep=",",
+        format="newick"
 ):
     """
     Using a Hill-Climbing heuristic to find a maximum likelihood tree from a set of
@@ -121,11 +135,11 @@ def hill_climbing(
     - compute the likelihood of all trees in the hop-neighbourhood
     - select the highest likelihood tree
     - if its likelihood is within tol of the best tree so far:
-      - reorder leaves of the current tree and decrease the patience counter
+      - reorder randomly the leaves of the current tree and decrease the patience counter
     - otherwise
       - the best tree becomes the current tree
       - the patience counter is set to max_patience
-    until the max number of iterations is reached or the patence counter is 0
+    until the max number of iterations is reached or the patience counter is 0
 
     Input:
     - fasta_path (str): pah to FASTA file
@@ -138,6 +152,8 @@ def hill_climbing(
     - max_nb_iterations (int): maximum number of iterations
     - out_file_path (str): path of the file where all explored trees are recorded
       together with their likelihood score
+    - sep (str): separator betwen fields in the output file
+    - format (str in ["newick","treevec"]): tree format in output file
     Output: Explored trees written in out_file_path
     """
     out_file = open(out_file_path, "w")
@@ -146,7 +162,9 @@ def hill_climbing(
         fasta_path, current_tree, DNA_model,
         tree_folder_path, outfile="tmp_0_.tree"
     )
-    out_file.write(f"START\t{current_score}\t{current_tree.treevec2newick()}\n")
+    _write_tree(
+        current_tree, current_score, "START", out_file, sep=sep, format=format
+    )
     stop = False
     patience_counter = max_patience
     iteration_counter = 1
@@ -175,13 +193,17 @@ def hill_climbing(
             )
         )
         iteration_counter += 1
-        out_file.write(f"{prefix}\t{current_score}\t{current_tree.treevec2newick()}\n")
+        _write_tree(
+            current_tree, current_score, prefix, out_file, sep=sep, format=format
+        )
 
-def random_walk(
+def _random_walk(
         fasta_path, DNA_model, tree_folder_path,
         first_tree, rng,
         max_nb_iterations,
-        out_file_path
+        out_file_path,
+        sep=",",
+        format="newick"
 ):
     """
     Performing a random walk in the tree space for a given number of iterations
@@ -195,6 +217,8 @@ def random_walk(
     - max_nb_iterations (int): maximum number of iterations (steps of the walk)
     - out_file_path (str): path of the file where all explored trees are recorded
       together with their likelihood score
+    - sep (str): separator betwen fields in the output file
+    - format (str in ["newick","treevec"]): tree format in output file
     Output: Explored trees written in out_file_path
     """
     out_file = open(out_file_path, "w")
@@ -204,7 +228,9 @@ def random_walk(
         fasta_path, current_tree, DNA_model,
         tree_folder_path, outfile="tmp_0_.tree"
     )
-    out_file.write(f"START\t{current_score}\t{current_tree.treevec2newick()}\n")
+    _write_tree(
+        current_tree, current_score, "START", out_file, sep=sep, format=format
+    )
     for i in range(max_nb_iterations):
         new_tree = current_tree.random_hop(rng, inplace=False)
         current_tree = new_tree
@@ -212,68 +238,28 @@ def random_walk(
             fasta_path, current_tree, DNA_model,
             tree_folder_path, outfile=f"tmp_0_{i}.tree"
         )
-        out_file.write(f"RANDOM\t{current_score}\t{current_tree.treevec2newick()}\n")
+        _write_tree(
+            current_tree, current_score, "RANDOM", out_file, sep=sep, format=format
+        )
 
-def main(args):
+def hill_climbing(
+        fasta_path, DNA_model, tree_folder_path,
+        tol, max_patience, max_nb_iterations,
+        random_seed,
+        out_file_path,
+        sep=",",
+        format="newick"
+):
     # Read a FASTA file to record sequences (taxa) names
-    leaves = [record.id for record in _read_fasta(args.fasta_path)]
-
+    leaves = [record.id for record in _read_fasta(fasta_path)]
     # Instantiate a random numbers generators
-    rng = np.random.default_rng(args.random_seed)
-
+    rng = np.random.default_rng(random_seed)
     # Create a random tree to start from
     first_tree = _create_random_tree(leaves)
-
-    if args.cmd == "hc":
-        # Hill-Climbing exploration
-        hill_climbing(
-            args.fasta_path, args.DNA_model, args.tree_folder_path,
-            first_tree, rng,
-            args.tol, args.max_patience, args.max_nb_iterations,
-            args.out_file_path
-        )
-    elif args.cmd == "rw":
-        # Random Walk exploration
-        random_walk(
-            args.fasta_path, args.DNA_model, args.tree_folder_path,
-            first_tree, rng,
-            args.max_nb_iterations,
-            args.out_file_path
-        )
-
-def _parse_arguments():
-    description = "CEDAR-exploration: exploring the tree space"
-
-    argparser = argparse.ArgumentParser(prog="CEDAR-exploration", description=description)
-
-    subparsers = argparser.add_subparsers(title="commands", help="command help")
-
-    # Hill-Climbing
-    hc = subparsers.add_parser("hc", help="Hill-Climbing")
-    hc.set_defaults(cmd="hc")
-    hc.add_argument("--fasta_path", type=str, help="Input FASTA file")
-    hc.add_argument("--DNA_model", type=str, help="Input DNA model for Raxml")
-    hc.add_argument("--tree_folder_path", type=str, help="Path to folder where trees are written for Raxml (not created)")
-    hc.add_argument("--tol", type=float, default=0.001, help="Tolerance to dcide if a best tree has been found")
-    hc.add_argument("--max_patience", type=int, default=3, help="Max number of leaves reordering steps if no best neighbour is found")
-    hc.add_argument("--max_nb_iterations", type=int, default=100000, help="Max number of iterations")
-    hc.add_argument("--random_seed", type=int, default=0, help="Random number generator seed")
-    hc.add_argument("--out_file_path", type=str, help="Path to output file")
-
-    # Random Walk
-    rw = subparsers.add_parser("rw", help="Random Walk")
-    rw.set_defaults(cmd="rw")
-    rw.add_argument("--fasta_path", type=str, help="Input FASTA file")
-    rw.add_argument("--DNA_model", type=str, help="Input DNA model for Raxml")
-    rw.add_argument("--tree_folder_path", type=str, help="Path to folder where trees are written for Raxml (not created)")
-    rw.add_argument("--max_nb_iterations", type=int, default=100000, help="Max number of iterations")
-    rw.add_argument("--random_seed", type=int, default=0, help="Random number generator seed")
-    rw.add_argument("--out_file_path", type=str, help="Path to output file")
-
-    return argparser.parse_args()
-
-if __name__ == "__main__":
-
-    args = _parse_arguments()
-
-    main(args)
+    _hill_climbing(
+        fasta_path, DNA_model, tree_folder_path,
+        first_tree, rng,
+        tol, max_patience, max_nb_iterations,
+        out_file_path,
+        sep=sep, format=format
+    )
