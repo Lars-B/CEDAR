@@ -13,7 +13,6 @@ __status__ = "Release"
 
 from ete3 import Tree
 from LIS import LIS_len, LIS_seq
-from numpy import random
 
 # Separator between a label and a node name in a tree representation
 SEP_NODE = ":"
@@ -193,7 +192,7 @@ class TreeVec:
 
     def tree2treevec(self, tree, leaf2idx=None):
         """
-        Compute the vector representation of a tree with n leaves rom a Tree objet
+        Compute the vector representation of a tree with n leaves from a Tree objet
         Input:
         - t: Tree object with features "name" and "dist" (branch length)
         - leaf2idx: dict(str -> int) leaf name to leaf label
@@ -313,6 +312,25 @@ class TreeVec:
         tree = Tree(newick_str, format=1)
         return self.tree2treevec(tree, leaf2idx=leaf2idx)
 
+    def reorder_leaves(self, rng):
+        """
+        Reorder the leaves of the current tree randomly
+        Input:
+        - rng (Generator): numpy random numbers generator
+        Output:
+        - TreeVec
+        """
+        leaf2idx,_ = self.extract_leaves_order()
+        leaves_idx = list(leaf2idx.values())
+        leaves_labels = list(leaf2idx.keys())
+        rng.shuffle(leaves_idx)
+        leaf2idx = {
+            leaves_labels[i]: leaves_idx[i]
+            for i in range(len(leaves_idx))
+        }
+        new_tree = TreeVec(tree=self.treevec2tree(), leaf2idx=leaf2idx)
+        return new_tree
+        
     """ Hop-related functions
     A hop is an SPR, so a subtree is pruned then regrafted.
     Not every SPR is a hop as the following restriction applies to hop:
@@ -477,17 +495,17 @@ class TreeVec:
             if not moved_node[3]:
                 k = leafpos[moved_node[0]-1]
                 range_j = list(self._compute_hops_range(i, k, size=False))
-                ngb += range_j if export_list else [
+                ngb += [(i,j) for j in range_j] if export_list else [
                     self.hop(i,j, inplace=False) for j in range_j
                 ]
         return ngb
     
-    def random_hop(self, seed=0, inplace=False):
+    def random_hop(self, rng, inplace=False):
         """
         Computes a new TreeVec representing a tree differing from self by a single random hop
         under the uniform distribution.
         Input:
-        - seed: random generator seed
+        - rng: random numbers generator
         - inplace(bool): If True modifies the curren object, otherwise returns a new object
         Output:
         - TreeVec
@@ -495,7 +513,6 @@ class TreeVec:
         # Number of possible random hops
         hop_ngb_size = self.hop_neighbourhood_size()
         # Index of the hop to apply
-        rng = random.default_rng(seed)
         hop_rank = rng.integers(1,high=hop_ngb_size+1)
         leafpos = self._compute_leaves_positions()
         # Number of possible hops already considered
