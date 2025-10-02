@@ -130,21 +130,22 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   - otherwise:  
     - the best tree becomes the current tree  
     - the patience counter is set to max_patience  
-  until the maximum number of iterations is reached or the patience counter is 0  
+  - until the maximum number of iterations is reached or the patience counter is 0  
 
   ```
   python src/CEDAR.py HOP_hc --fasta_path FASTA_file --DNA_model DNA_model --tree_folder_path tree-folder_path \
-  	 	      	     --out_file_path out_file \
-                             [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
-			     [--seed sandom number generator seed]			     
+  --out_file_path out_file \
+  [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
+  [--seed sandom number generator seed]			     
   ```	
-  All visited trees are recorded in the file `out_file` in format `<START,NEIGHBOUR,REORDER>,<likelihood score>,<Newick tree>`
-  where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where
-  the leaves order was randomly shuffled.
-  Parameter `seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.
-  Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).
-  Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and as default value `5`.
-  Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
+  All visited trees are recorded in the file `out_file` in format `<START,NEIGHBOUR,REORDER>,<likelihood score>,<Newick tree>`  
+  where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where  
+  the leaves order was randomly shuffled.  
+  Parameter `seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
+  Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).  
+  Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and as default value `5`.  
+  Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least  
+  `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
 
 
 ## Class TreeVec
