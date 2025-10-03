@@ -70,7 +70,7 @@ class TreeVec:
             treevec_str=None,
             leaf2idx=None,
             idx2leaf=None,
-            format=None,
+            format_str=None,
             compact=None
     ):
         """
@@ -81,12 +81,12 @@ class TreeVec:
         - If newick_str is not None it is created from newick_str using idx2leaf and
           expected in Newick format=1   
         - If treevec_str is not None it is created from treevec_str using idx2leaf and
-          expected in format defined by format and compact
+          expected in format defined by format_str and compact
         - Otherwise an empty vector is created
         - leaf2idx (dict str -> int): leaf name to index in a total order on leaves
           (1-base)
         - idx2leaf (dict int -> str): reverse dictionary
-        - format (int in [1,2])
+        - format_str (int in [1,2])
         - compact (bool)
         """
         self.vector = []
@@ -99,7 +99,7 @@ class TreeVec:
         elif treevec_str is not None:
             self.vector = self.str2treevec(
                 treevec_str, idx2leaf,
-                format=format, compact=compact
+                format_str=format_str, compact=compact
             )
 
     def copy(self):
@@ -237,36 +237,36 @@ class TreeVec:
             v += paths[i][::-1] + [[i,leaf.name,leaf.dist,True]]
         return v
     
-    def treevec2str(self, format=1, compact=True):
+    def treevec2str(self, format_str=1, compact=True):
         """
         Transform a tree vector representation into a string in format
-        defined by format (1 or 2) and compact (True or False)
+        defined by format_str (1 or 2) and compact (True or False)
         """
         sep_vec,sep_node = SEP_VEC,SEP_NODE, 
         _,idx2leaf = self.extract_leaves_order()
         out_str = []
         for node in self.vector:
             [label,name,dist,leaf] = node
-            if format == 1 and (not compact):
+            if format_str == 1 and (not compact):
                 out_str.append(f"{label}{sep_node}{name}{sep_node}{dist}")
-            elif format == 2 and (not compact):
+            elif format_str == 2 and (not compact):
                 out_str.append(f"{label}{sep_node}{name}")
-            elif format == 1 and compact and (not leaf):
+            elif format_str == 1 and compact and (not leaf):
                 out_str.append(f"{label}{sep_node}{name}{sep_node}{dist}")
-            elif format == 1 and compact and leaf:
+            elif format_str == 1 and compact and leaf:
                 out_str.append(f"{dist}")
-            elif format == 2 and compact and (not leaf):
+            elif format_str == 2 and compact and (not leaf):
                 out_str.append(f"{label}{sep_node}{name}")
-            elif format == 2 and compact and leaf:
+            elif format_str == 2 and compact and leaf:
                 out_str.append("")
         return f"{sep_vec.join(out_str)};"
 
-    def str2treevec(self, s, idx2leaf, format=1, compact=True):
+    def str2treevec(self, s, idx2leaf, format_str=1, compact=True):
         """
         Reads a tree vector representation from a string s
         Input:
         - s (str): string encoding of a tree vector representation
-        - format (int in [1,2]): expected encoding format
+        - format_str (int in [1,2]): expected encoding format
         - compact (bool): if True, compact writing
         """
         sep_vec,sep_node = SEP_VEC,SEP_NODE
@@ -276,18 +276,18 @@ class TreeVec:
         v,j = [],1
         for node_str in s1:
             node = node_str.split(sep_node)
-            if format == 1 and (not compact):
+            if format_str == 1 and (not compact):
                 label,name,dist = int(node[0]),node[1],float(node[2])
-            elif format == 2 and (not compact):
+            elif format_str == 2 and (not compact):
                 label,name,dist = int(node[0]),node[1],1.0
-            elif format == 1 and compact and len(node) == 3:
+            elif format_str == 1 and compact and len(node) == 3:
                 label,name,dist = int(node[0]),node[1],float(node[2])
-            elif format == 1 and compact and len(node) == 1:
+            elif format_str == 1 and compact and len(node) == 1:
                 label,name,dist = j,idx2leaf[j],float(node[0])
                 j += 1
-            elif format == 2 and compact and len(node) == 2:
+            elif format_str == 2 and compact and len(node) == 2:
                 label,name,dist = int(node[0]),node[1],1.0
-            elif format == 2 and compact and len(node) == 1:
+            elif format_str == 2 and compact and len(node) == 1:
                 label,name,dist = j,idx2leaf[j],1.0
                 j += 1
             leaf = (False if occurrences[label]==0 else True)
@@ -309,7 +309,7 @@ class TreeVec:
         - leaf2idx: dict(str -> int) leaf name to leaf label
         if None: leaf labels added during a postorder traversal in order of visit.
         """
-        tree = Tree(newick_str, format=1)
+        tree = Tree(newick_str, format_str=1)
         return self.tree2treevec(tree, leaf2idx=leaf2idx)
 
     def reorder_leaves(self, rng):

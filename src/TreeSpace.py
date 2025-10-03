@@ -10,6 +10,7 @@ __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
 
+import os
 import argparse
 import numpy as np
 from Bio import SeqIO
@@ -46,7 +47,16 @@ def _create_random_tree(leaves):
     tree = TreeVec(tree=tree_aux)
     return tree
 
-def _neighborhood_ML_scores(current_tree, fasta_path, DNA_model, tree_folder_path, iteration_counter):
+def _clean_tree(tree_folder_path, tree_file, clean_tree):
+    _tree_file = os.path.join(tree_folder_path, tree_file)
+    if clean_tree and os.path.exists(_tree_file):
+        os.remove(_tree_file)    
+
+def _neighborhood_ML_scores(
+        current_tree,
+        fasta_path, DNA_model,
+        tree_folder_path, iteration_counter, clean_tree
+):
     """
     Compute the likelihood of all trees in the neighbourhood of a tree using Raxml
 
@@ -56,6 +66,7 @@ def _neighborhood_ML_scores(current_tree, fasta_path, DNA_model, tree_folder_pat
     - DNA_model (str): DNA evolution model to use in Raxml
     - tree_folder_path (str): pah to folder where Newick trees are written
     - iteration_counter (int): iteration counter in hill-climbing process
+    - clean_tree (bool): if True the created tree file is deleted after Raxml runs
     Output:
     - ngb_scores (list((int,int),float)):
       list of the hop (i,j) and likelihood score of all trees in the neighbourhood
@@ -69,14 +80,20 @@ def _neighborhood_ML_scores(current_tree, fasta_path, DNA_model, tree_folder_pat
         # New tree obtained by prforming hop (i,j)
         ngb_tree = current_tree.hop(i,j,inplace=False)
         # Liklihood score of new_tree
+        _tree_file = f"tmp_{iteration_counter}_{i}_{j}.tree"
         ngb_tree_score = raxml_loss(
             fasta_path, ngb_tree, DNA_model,
-            tree_folder_path, outfile=f"tmp_{iteration_counter}_{i}_{j}.tree"
+            tree_folder_path, outfile=_tree_file
         )
+        _clean_tree(tree_folder_path, _tree_file, clean_tree)
         ngb_scores.append(((i,j),ngb_tree_score))
     return ngb_scores
 
-def best_ML_neighbour(current_tree, current_score, fasta_path, DNA_model, tree_folder_path, iteration_counter):
+def best_ML_neighbour(
+        current_tree, current_score,
+        fasta_path, DNA_model,
+        tree_folder_path, iteration_counter, clean_tree
+):
     """
     Chose the next tree as the best neighbouring tree in terms of likelihood score
 
@@ -87,13 +104,15 @@ def best_ML_neighbour(current_tree, current_score, fasta_path, DNA_model, tree_f
     - DNA_model (str): DNA evolution model to use in Raxml
     - tree_folder_path (str): pah to folder where Newick trees are written
     - iteration_counter (int): iteration counter in hill-climbing process
+    - clean_tree (bool): if True the created tree file is deleted after Raxml runs
     Output:
     - best_ngb_tree (TreeVec): best neighbour tree
     - best_ngb_score (float): score of best neighbour tree
     """
     # Computing the likelihood of all trees in the neighbourhood
     ngb_scores_and_hops = _neighborhood_ML_scores(
-        current_tree, fasta_path, DNA_model, tree_folder_path, iteration_counter
+        current_tree, fasta_path, DNA_model,
+        tree_folder_path, iteration_counter, clean_tree
     )
     # Isolating liklihood scores in the same order than in ngb_scores_and_hops
     ngb_scores = [ngb_result[1] for ngb_result in ngb_scores_and_hops]
@@ -106,25 +125,21 @@ def best_ML_neighbour(current_tree, current_score, fasta_path, DNA_model, tree_f
     best_ngb_score = ngb_scores[best_score_idx]
     return best_ngb_tree,best_ngb_score
 
-def _write_tree(tree, score, prefix, out_file, sep=",", format="newick"):
+def _write_tree(tree, score, prefix, out_file, sep):
     """
-    Write "<prefix><sep><score><sep><tree>" in out_file
-    if format is "newick: write the newick tree
-    if format is "treevc" write in TreeVec format
+    Write "<prefix><sep><score><sep><tree newick><sep><tree treevec>" in out_file
     """
-    if format == "newick":
-        tree_str = tree.treevec2newick()
-    elif format == "teevec":
-        tree_str = tree.treevec2str()
-    out_file.write(f"{prefix}{sep}{score}{sep}{tree_str}\n")    
+    tree_newick = tree.treevec2newick()
+    tree_treevec = tree.treevec2str(format_str=1,compact=False)
+    out_file.write(f"{prefix}{sep}{score}{sep}{tree_newick}{sep}{tree_treevec}\n")
 
 def _hill_climbing(
         fasta_path, DNA_model, tree_folder_path,
         first_tree, rng,
         tol, max_patience, max_nb_iterations,
         out_file_path,
-        sep=",",
-        format="newick"
+        sep,
+        clean_tree
 ):
     """
     Using a Hill-Climbing heuristic to find a maximum likelihood tree from a set of
@@ -152,18 +167,20 @@ def _hill_climbing(
     - max_nb_iterations (int): maximum number of iterations
     - out_file_path (str): path of the file where all explored trees are recorded
       together with their likelihood score
-    - sep (str): separator betwen fields in the output file
-    - format (str in ["newick","treevec"]): tree format in output file
+    - sep (str): separator between fields in the output file
+    - clean_tree (bool): if True the created tree file is deleted after Raxml runs
     Output: Explored trees written in out_file_path
     """
     out_file = open(out_file_path, "w")
     current_tree = first_tree
+    _tree_file = "tmp_0_.tree"
     current_score = raxml_loss(
         fasta_path, current_tree, DNA_model,
-        tree_folder_path, outfile="tmp_0_.tree"
+        tree_folder_path, outfile=_tree_file
     )
+    _clean_tree(tree_folder_path, _tree_file, clean_tree)
     _write_tree(
-        current_tree, current_score, "START", out_file, sep=sep, format=format
+        current_tree, current_score, "START", out_file, sep=sep
     )
     stop = False
     patience_counter = max_patience
@@ -172,7 +189,7 @@ def _hill_climbing(
         best_ngb_tree,best_ngb_score = best_ML_neighbour(
             current_tree, current_score,
             fasta_path, DNA_model, tree_folder_path,
-            iteration_counter
+            iteration_counter, clean_tree
         )
         if best_ngb_score - current_score > tol:
             current_tree = best_ngb_tree
@@ -194,7 +211,7 @@ def _hill_climbing(
         )
         iteration_counter += 1
         _write_tree(
-            current_tree, current_score, prefix, out_file, sep=sep, format=format
+            current_tree, current_score, prefix, out_file, sep=sep
         )
 
 def _random_walk(
@@ -202,8 +219,8 @@ def _random_walk(
         first_tree, rng,
         max_nb_iterations,
         out_file_path,
-        sep=",",
-        format="newick"
+        sep,
+        clean_tree
 ):
     """
     Performing a random walk in the tree space for a given number of iterations
@@ -217,38 +234,40 @@ def _random_walk(
     - max_nb_iterations (int): maximum number of iterations (steps of the walk)
     - out_file_path (str): path of the file where all explored trees are recorded
       together with their likelihood score
-    - sep (str): separator betwen fields in the output file
-    - format (str in ["newick","treevec"]): tree format in output file
+    - sep (str): separator between fields in the output file
+    - clean_tree (bool): if True the created tree file is deleted after Raxml runs
     Output: Explored trees written in out_file_path
     """
     out_file = open(out_file_path, "w")
     current_tree = first_tree
     current_score = None
+    _tree_file = "tmp_0_.tree"
     current_score = raxml_loss(
         fasta_path, current_tree, DNA_model,
-        tree_folder_path, outfile="tmp_0_.tree"
+        tree_folder_path, outfile=_tree_file
     )
+    _clean_tree(tree_folder_path, _tree_file, clean_tree)
     _write_tree(
-        current_tree, current_score, "START", out_file, sep=sep, format=format
+        current_tree, current_score, "START", out_file, sep=sep
     )
     for i in range(max_nb_iterations):
         new_tree = current_tree.random_hop(rng, inplace=False)
         current_tree = new_tree
+        _tree_file = f"tmp_0_{i}.tree"
         current_score = raxml_loss(
             fasta_path, current_tree, DNA_model,
-            tree_folder_path, outfile=f"tmp_0_{i}.tree"
+            tree_folder_path, outfile=_tree_file
         )
+        _clean_tree(tree_folder_path, _tree_file, clean_tree)
         _write_tree(
-            current_tree, current_score, "RANDOM", out_file, sep=sep, format=format
+            current_tree, current_score, "RANDOM", out_file, sep=sep
         )
 
 def hill_climbing(
         fasta_path, DNA_model, tree_folder_path,
         tol, max_patience, max_nb_iterations,
         random_seed,
-        out_file_path,
-        sep=",",
-        format="newick"
+        out_file_path
 ):
     # Read a FASTA file to record sequences (taxa) names
     leaves = [record.id for record in _read_fasta(fasta_path)]
@@ -261,5 +280,6 @@ def hill_climbing(
         first_tree, rng,
         tol, max_patience, max_nb_iterations,
         out_file_path,
-        sep=sep, format=format
+        sep="\t",
+        clean_tree=True
     )

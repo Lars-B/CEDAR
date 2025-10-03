@@ -108,7 +108,7 @@ def __read_TreeVec_file(in_TreeVec_file):
     for TreeVec_tree in in_TreeVec_trees[1:]:
         TreeVec_trees.append(
             TreeVec(
-                treevec_str=TreeVec_tree, idx2leaf=idx2leaf, format=1, compact=True
+                treevec_str=TreeVec_tree, idx2leaf=idx2leaf, format_str=1, compact=True
             )
         )
     return TreeVec_trees,leaf2idx,idx2leaf
@@ -125,7 +125,7 @@ def __write_TreeVec_file(in_TreeVec_trees, idx2leaf, out_TreeVec_file):
     out_str = [f"#order {order2str(idx2leaf)}"]
     for TreeVec_tree in in_TreeVec_trees:
         out_str.append(
-            TreeVec_tree.treevec2str(format=1, compact=True)
+            TreeVec_tree.treevec2str(format_str=1, compact=True)
         )
     __write_file(out_str, out_TreeVec_file)
             
