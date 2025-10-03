@@ -138,7 +138,7 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
   [--seed sandom number generator seed]			     
   ```	
-  All visited trees are recorded in the file `out_file` in format `<START,NEIGHBOUR,REORDER>,<likelihood score>,<Newick tree>`  
+  All visited trees are recorded in the TSV file `out_file` in format `<S[TART,NEIGHBOUR,REORDER]>TAB<likelihood score>TAB<Newick tree>TAB<TreeVec tree>`  
   where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where
   the leaves order was randomly shuffled.  
   Parameter `seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
@@ -146,6 +146,7 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and has default value `5`.  
   Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least
   `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
+  The results
 
 
 ## Class TreeVec
