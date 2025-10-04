@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --time=24:00:00
+#SBATCH --time=36:00:00
 #SBATCH --mem=8G
 #SBATCH --account=def-chauvec
 #SBATCH --job-name=fluA
