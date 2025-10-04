@@ -146,11 +146,13 @@ def _hill_climbing(
     FASTA sequences.
 
     Algorithm:
+    current tree = first_tree
     iterate
+    - reorder randomly the leaves of the current tree
     - compute the likelihood of all trees in the hop-neighbourhood
     - select the highest likelihood tree
     - if its likelihood is within tol of the best tree so far:
-      - reorder randomly the leaves of the current tree and decrease the patience counter
+      - decrease the patience counter
     - otherwise
       - the best tree becomes the current tree
       - the patience counter is set to max_patience
@@ -186,6 +188,7 @@ def _hill_climbing(
     patience_counter = max_patience
     iteration_counter = 1
     while not stop:
+        current_tree = current_tree.reorder_leaves(rng)
         best_ngb_tree,best_ngb_score = best_ML_neighbour(
             current_tree, current_score,
             fasta_path, DNA_model, tree_folder_path,
@@ -197,7 +200,6 @@ def _hill_climbing(
             patience_counter = max_patience
             prefix = "NEIGHBOUR"
         else:
-            current_tree = current_tree.reorder_leaves(rng)
             patience_counter -= 1
             prefix = "REORDER"
         stop = (
@@ -252,7 +254,7 @@ def _random_walk(
     )
     for i in range(max_nb_iterations):
         new_tree = current_tree.random_hop(rng, inplace=False)
-        current_tree = new_tree
+        current_tree = new_tree.reorder_leaves(rng)
         _tree_file = f"tmp_0_{i}.tree"
         current_score = raxml_loss(
             fasta_path, current_tree, DNA_model,

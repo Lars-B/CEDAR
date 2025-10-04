@@ -122,11 +122,12 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Parameter `seed` is the seed of the random generator and has default value `0`.
 
 - Hill-climbig heuristic exploration of the tree space using HOPs:  
-  starting from a random tree, the heuristic iterates the following steps  
-  -compute the likelihood of all trees in the HOP neighbourhood of the current tree  
+  starting from a random tree, the heuristic iterates the following steps
+  - reorder randomly the leaves of the current tree
+  - compute the likelihood of all trees in the HOP neighbourhood of the current tree  
   - select the highest likelihood tree  
   - if its likelihood is within a given tolerance of the best tree so far:  
-    - reorder randomly leaves of the current tree and decrease a patience counter [patience step]  
+    - decrease a patience counter [patience step]  
   - otherwise:  
     - the best tree becomes the current tree  
     - the patience counter is set to max_patience  
