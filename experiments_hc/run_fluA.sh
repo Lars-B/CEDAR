@@ -4,8 +4,8 @@
 #SBATCH --account=def-chauvec
 #SBATCH --job-name=fluA
 #SBATCH --array=1-10
-#SBATCH --output=/scratch/chauvec/CEDAR/CEDAR/experiments_hc/log/fluA/fluA_%A_%a.out
-#SBATCH --error=/scratch/chauvec/CEDAR/CEDAR/experiments_hc/log/fluA/fluA_%A_%a.err
+#SBATCH --output=/scratch/chauvec/CEDAR/CEDAR/experiments_hc/log/fluA/fluA_%a.out
+#SBATCH --error=/scratch/chauvec/CEDAR/CEDAR/experiments_hc/log/fluA/fluA_%a.err
 
 module load StdEnv/2023  gcc/12.3  openmpi/4.1.5 raxml-ng/1.2.0 python/3.11.5
 

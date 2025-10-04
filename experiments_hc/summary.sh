@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DATASET=$1
-LOG_ID=$2
+# LOG_ID=$2
 
 module load StdEnv/2023  gcc/12.3  openmpi/4.1.5 raxml-ng/1.2.0 python/3.11.5
 
@@ -14,7 +14,7 @@ touch ${TREES_FILE_NWK}
 for i in {1..10}
 do
     RES_FILE=${RES_DIR}/${DATASET}_${i}.tsv
-    LOG_FILE=${LOG_DIR}/${DATASET}_${LOG_ID}_${i}.err
+    LOG_FILE=${LOG_DIR}/${DATASET}_${i}.err
     if [ ! -s "${LOG_FILE}" ]; then
 	tail -1 ${RES_FILE} | cut -f 3 >> ${TREES_FILE_NWK}
     else
