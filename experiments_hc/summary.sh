@@ -13,7 +13,7 @@ touch ${TREES_FILE_NWK}
 
 for i in {1..10}
 do
-    RES_FILE=${RES_DIR}/${DATASET}_${i}.csv
+    RES_FILE=${RES_DIR}/${DATASET}_${i}.tsv
     LOG_FILE=${LOG_DIR}/${DATASET}_${LOG_ID}_${i}.err
     if [ ! -s "${LOG_FILE}" ]; then
 	tail -1 ${RES_FILE} | cut -f 3 >> ${TREES_FILE_NWK}

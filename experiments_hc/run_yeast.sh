@@ -12,7 +12,7 @@ module load StdEnv/2023  gcc/12.3  openmpi/4.1.5 raxml-ng/1.2.0 python/3.11.5
 CEDAR_DIR=/scratch/chauvec/CEDAR/CEDAR
 EXP_DIR=${CEDAR_DIR}/experiments_hc
 
-RES_OUT=${EXP_DIR}/results/yeast/yeast_${SLURM_ARRAY_TASK_ID}.csv
+RES_OUT=${EXP_DIR}/results/yeast/yeast_${SLURM_ARRAY_TASK_ID}.tsv
 TREE_DIR=${EXP_DIR}/tree_folder/yeast/run_${SLURM_ARRAY_TASK_ID}
 
 rm -rf  ${RES_OUT} ${TREE_DIR}

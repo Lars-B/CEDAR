@@ -305,11 +305,11 @@ class TreeVec:
 
     def newick2treevec(self, newick_str, leaf2idx=None):
         """
-        Instantiate a vector representaion from a Newick string
+        Instantiate a vector representation from a Newick string
         - leaf2idx: dict(str -> int) leaf name to leaf label
         if None: leaf labels added during a postorder traversal in order of visit.
         """
-        tree = Tree(newick_str, format_str=1)
+        tree = Tree(newick_str, format=1)
         return self.tree2treevec(tree, leaf2idx=leaf2idx)
 
     def reorder_leaves(self, rng):
