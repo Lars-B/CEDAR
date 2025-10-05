@@ -15,6 +15,8 @@ The directory [example](example/) contains an example of using CEDAR through com
 The directory [experiments](experiments) contains the code to reproduce the experiments described in the 
 paper *"A Vector Representation for Phylogenetic Trees"*.
 
+The directory [experiments_hc](experiments_hc) contains the code to reproduce the experiments using the hill-climbing tree space exploration experiments.
+
 ## Vector encoding of phylogenetic trees
 
 CEDAR implements a vector representation of rooted phylogenetic trees. 
