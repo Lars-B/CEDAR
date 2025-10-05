@@ -8,7 +8,7 @@ the paper *"A Vector Representation for Phylogenetic Trees"*.
 CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file 
 [TreeVec.py](src/TreeVec.py).
 
-*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>; <a href="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> for the hill-climbing tree exploration heuristic.
+*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>; <a href="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> for the hill-climbing tree space exploration heuristic.
 
 The directory [example](example/) contains an example of using CEDAR through command-line.
 
