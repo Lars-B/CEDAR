@@ -8,7 +8,7 @@ the paper *"A Vector Representation for Phylogenetic Trees"*.
 CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file 
 [TreeVec.py](src/TreeVec.py).
 
-*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>.
+*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>; <a href="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> for the hill-climbing tree exploration heuristic.
 
 The directory [example](example/) contains an example of using CEDAR through command-line.
 
@@ -125,15 +125,17 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
 
 - Hill-climbig heuristic exploration of the tree space using HOPs:  
   starting from a random tree (created with the `ete3` function `populate`), the heuristic iterates the following steps:
-  - reorder randomly the leaves of the current tree
-  - compute the likelihood of all trees in the HOP neighbourhood of the current tree using `raxml-ng` using a chosen DNA evolution model (parameter `DNA_model`)  
-  - select the best likelihood tree  
+  - reorder randomly the leaves of the current tree,  
+  - compute the likelihood of all trees in the HOP neighbourhood of the current tree using <a href="https://github.com/amkozlov/raxml-ng">raxml-ng</a> using a chosen DNA evolution model (parameter `DNA_model`),  
+  - select the best likelihood tree,  
   - if its likelihood is within a given tolerance (parameter `tol`) of the best tree so far:  
-    - decrease a patience counter [patience step]  
+    - decrease a patience counter [patience step],  
   - otherwise:  
-    - the best tree becomes the current tree  
-    - the patience counter is reset to max_patience (parameter `max_patience`)  
-  - until the maximum number of iterations (parameter `max_nb_iterations`) is reached or the patience counter is 0  
+    - the best tree becomes the current tree,  
+    - the patience counter is reset to max_patience (parameter `max_patience`),  
+  - until the maximum number of iterations (parameter `max_nb_iterations`) is reached or the patience counter is 0.  
+
+  This command requires that the command `raxml-ng` is available in the default path.  
 
   ```
   python src/CEDAR.py HOP_hc --fasta_path FASTA_file --DNA_model DNA_model --tree_folder_path tree-folder_path \
