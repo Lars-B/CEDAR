@@ -122,16 +122,16 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Parameter `seed` is the seed of the random generator and has default value `0`.
 
 - Hill-climbig heuristic exploration of the tree space using HOPs:  
-  starting from a random tree, the heuristic iterates the following steps
+  starting from a random tree (created with the `ete3` function `populate`), the heuristic iterates the following steps:
   - reorder randomly the leaves of the current tree
-  - compute the likelihood of all trees in the HOP neighbourhood of the current tree usng `raxml-ng`   
-  - select the highest likelihood tree  
-  - if its likelihood is within a given tolerance of the best tree so far:  
+  - compute the likelihood of all trees in the HOP neighbourhood of the current tree using `raxml-ng` using a chosen DNA evolution model (parameter `DNA_model`)  
+  - select the best likelihood tree  
+  - if its likelihood is within a given tolerance (parameter `tol`) of the best tree so far:  
     - decrease a patience counter [patience step]  
   - otherwise:  
     - the best tree becomes the current tree  
-    - the patience counter is set to max_patience  
-  - until the maximum number of iterations is reached or the patience counter is 0  
+    - the patience counter is reset to max_patience (parameter `max_patience`)  
+  - until the maximum number of iterations (parameter `max_nb_iterations`) is reached or the patience counter is 0  
 
   ```
   python src/CEDAR.py HOP_hc --fasta_path FASTA_file --DNA_model DNA_model --tree_folder_path tree-folder_path \
@@ -139,15 +139,13 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
   [--seed sandom number generator seed]			     
   ```	
-  All visited trees are recorded in the TSV file `out_file` in format `<S[TART,NEIGHBOUR,REORDER]>TAB<likelihood score>TAB<Newick tree>TAB<TreeVec tree>`  
-  where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where
-  the leaves order was randomly shuffled.  
+  All visited trees are recorded in the TSV file `out_file` in format `<[START,NEIGHBOUR,REORDER]>TAB<likelihood score>TAB<Newick tree>TAB<TreeVec tree>`  
+  where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patience step where the leaves order was randomly shuffled.  
   Parameter `seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
-  Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).  
-  Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and has default value `5`.  
-  Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least
-  `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
-  The results
+  Parameter `max_nb_iterations` limts the number of iterations and has value default `None` (no limit to the number of iterations, the heuristic stops at a local optimum).  
+  Parameter `max_patience` limits the number of times a patience steps is repeated consecutively and has default value `5`.  
+  Parameter `tol` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
+  The results are recorded in file `out_file_path`.
 
 
 ## Class TreeVec
@@ -170,5 +168,6 @@ The main methods of the class, aside of the constuctor, are:
 - `hop_neighbourhood`: computes the `TreeVec` representations of the trees in the HOP neighbourhood of the tree encoded by the object;
 - `hop_similarity`: computes the HOP similarity or a HOP LCS (see paper for an explanation) with another tree;
 - `hop_next`: creates a tree one HOP closer to a target tree;
-- `random_hop`: peform a uniform random HOP on the current tree.
+- `random_hop`: peform a uniform random HOP on the current tree;
+- `reorder_leaves`: create a new `TreeVec` object fom the current one differing by a random reordering of the leaves.
 
