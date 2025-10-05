@@ -69,5 +69,5 @@ experiments_hc > ./summary.sh yeast
 ```
 
 Looking at the scores files, all runs end on trees with very similar ML scores.
-For the samll (8 taxa) yeast dataset, all runs end at the same tree.
+For the small (8 taxa) yeast dataset, all runs end at the same tree.
 These resuls are similar to the experiments of `Phylo2Vec` with a similar hill-climbing heuristic.
