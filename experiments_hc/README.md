@@ -24,9 +24,22 @@ Loading required package: ape
 > write.phyDat(yeast, "yeast.fasta", format="fasta")
 ```
 
+## Method: Hill-climbing heuristic
+
+Starting from a random tree, the heuristic iterates the following steps
+  - reorder randomly the leaves of the current tree
+  - compute the likelihood of all trees in the HOP neighbourhood of the current tree
+  - select the best likelihood tree
+  - if its likelihood is within a given tolerance (`0.001`) of the best tree so far:
+    - decrease a patience counter [patience step]
+  - otherwise:
+    - the best tree becomes the current tree
+    - the patience counter is reset to max_patience (`max_patience=5`)  
+until the maximum number of iterations is reached or the patience counter is 0
+
 ## Experiments
 
-For each dataset, run 10 hill-climbing exploration with a random starting tree.
+For each dataset, run 10 hill-climbing explorations with a random starting tree.
 
 ```
 sed 's/DATASET/zika/g' run_template.sh > run_zika.sh
@@ -40,17 +53,20 @@ experiments_hc > sbatch run_yeast.sh
 ```
 
 Summarizing: computing the parwise HOP similarity between the last tree obtained in each run.
-For each dataset `DATASET` computing three files:  
+For each dataset `DATASET` computing several  files:
+- `results/<DATASET>/<DATASET>_scores.csv`: ML score of the last tree of each run;  
+- `results/<DATASET>/<DATASET>_best_tree_[1-10].nwk`: last tree of each run in Newick format;  
 - `results/<DATASET>/<DATASET>_best_trees.nwk`: last tree of each run in Newick format;  
 - `results/<DATASET>/<DATASET>_best_trees.treevec`: last tree of each run in TreeVec format;  
-- `results/<DATASET>/<DATASET>.dist`: pairwise HOP similarity between trees above.
+- `results/<DATASET>/<DATASET>_HOP.dist`: pairwise HOP similarity between trees above.
+- `results/<DATASET>/<DATASET>_RF.dist`: pairwise normalized RF distance between trees above.	
 ```
-experiments_hc > ./summary.sh zika 6388415
-experiments_hc > ./summary.sh h3n2_na_20 6388418
-experiments_hc > ./summary.sh yeast 6388420
-experiments_hc > ./summary.sh fluA 6388416
-run 2 terminated with an error
-run 3 terminated with an error
+experiments_hc > ./summary.sh fluA
+experiments_hc > ./summary.sh h3n2_na_20
+experiments_hc > ./summary.sh zika
+experiments_hc > ./summary.sh yeast
 ```
-Two runs of the `fluA` dataset did not finish in time, their final trees are not considered.
-Overall we observe a wide range of similarity between the final trees of the runs, which is not a good result.
+
+Looking at the scores files, all runs end on trees with very similar ML scores.
+For the samll (8 taxa) yeast dataset, all runs end at the same tree.
+These resuls are similar to the experiments of `Phylo2Vec` with a similar hill-climbing heuristic.
