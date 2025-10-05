@@ -3,10 +3,10 @@
 ## Data
 Data is taken from the datasets used in the Phylo2Vec paper, as given in their github repo:
 <a href="https://github.com/sbhattlab/phylo2vec/tree/main/py-phylo2vec/phylo2vec/datasets/descr">Phylo2Vec datasets</a>:
-- <a href="https://github.com/neherlab/treetime_examples/blob/master/data/zika/zika.fasta">Zika dataset</a>  
-- <a href="https://github.com/4ment/phylostan/blob/master/examples/fluA/fluA.fa">fluA dataset</a>
-- <a href="https://github.com/neherlab/treetime_examples/blob/master/data/h3n2_na/h3n2_na_20.fasta">h3n2_na dataset</a>
-- <a href="">yeast dataset</a>
+- <a href="https://github.com/neherlab/treetime_examples/blob/master/data/zika/zika.fasta">Zika dataset</a> (86 taxa, 10,807nt sequences)  
+- <a href="https://github.com/4ment/phylostan/blob/master/examples/fluA/fluA.fa">fluA dataset</a> (69 taxa, 987nt sequences)  
+- <a href="https://github.com/neherlab/treetime_examples/blob/master/data/h3n2_na/h3n2_na_20.fasta">h3n2_na dataset</a> (19 taxa, 1,407nt sequences)  
+- <a href="https://github.com/KlausVigo/phangorn/blob/main/data/yeast.RData">yeast dataset</a> (8 taxa, 127,018nt sequences)  
 
 
 ```
