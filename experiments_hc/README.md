@@ -34,7 +34,8 @@ Starting from a random tree, the heuristic iterates the following steps
     - decrease a patience counter [patience step]
   - otherwise:
     - the best tree becomes the current tree
-    - the patience counter is reset to max_patience (`max_patience=5`)  
+    - the patience counter is reset to max_patience (`max_patience=5`)
+
 until the maximum number of iterations is reached or the patience counter is 0
 
 ## Experiments
