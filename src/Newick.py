@@ -24,13 +24,23 @@ from TreeVec import (
     write_TreeVec_file
 )
 
+def read_newick_file(in_Newick_file):
+    _Newick_trees = __read_file(in_Newick_file)
+    Newick_trees = []
+    for tree in _Newick_trees:
+        if tree[-1] != ";":
+            Newick_trees.append(f"{tree};")
+        else:
+            Newick_trees.append(tree)
+    return Newick_trees
+            
 def convert_Newick2TreeVec(in_Newick_file, out_TreeVec_file, leaves_order_file=None):
     """
     Converts the trees in in_Newick_file into TreeVec strings written in out_TreeVec_file
     If leaves_order_file is not None, it is used to define the leaves order
     """
     # Reading the Newick trees
-    in_Newick_trees = __read_file(in_Newick_file)
+    in_Newick_trees = read_newick_file(in_Newick_file)
     # Determining the leaves order if provided
     if leaves_order_file is not None:
         leaf2idx,idx2leaf = read_leaves_order_file(leaves_order_file)
