@@ -220,7 +220,6 @@ if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser(prog="CEDAR-GR", description=description)
     subparsers = argparser.add_subparsers(title="commands", help="command help")
-
     # Creating Gelman Rubin diagnostic values for two chains
     GR = subparsers.add_parser("GR", help="Gelman Rubin diagnosic values")
     GR.set_defaults(cmd="GR")
