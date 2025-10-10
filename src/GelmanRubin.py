@@ -202,14 +202,13 @@ def GelmanRubin(
                 i += 1
     # Computing Gelman Rubin statistics
     GR = _GelmanRubin(in_TreeVec_trees[1], in_TreeVec_trees[2])
-
+    # Writing output files
     with open(out_orders_file, "w") as _out_file:
         _out_file.write("seed\tindex\torder\n")
         i = 0
         for order_str in leaves_orders:
             _out_file.write(f"{random_seed}\t{i}\t{order_str}\n")
-            i += 1
-    
+            i += 1    
     with open(out_gr_file, "w") as _out_file:
         _out_file.write("index\tchain1\tchain2\n")
         for i in range(nb_trees):
@@ -220,6 +219,7 @@ if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser(prog="CEDAR-GR", description=description)
     subparsers = argparser.add_subparsers(title="commands", help="command help")
+    
     # Creating Gelman Rubin diagnostic values for two chains
     GR = subparsers.add_parser("GR", help="Gelman Rubin diagnosic values")
     GR.set_defaults(cmd="GR")
