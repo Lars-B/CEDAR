@@ -243,17 +243,3 @@ if __name__ == "__main__":
         args.output_gr_file,
         args.output_orders_file
     )
-    
-    # _tree = TreeVec(newick_str=f"{in_Newick_trees_1[0].rstrip()};")
-    # leaf2idx,idx2leaf = _tree.extract_leaves_order()    
-    # leaves_order_str = order2str(idx2leaf)
-    # # TO DO: random leaves order?
-
-    # in_trees_1 = [
-    #     TreeVec(newick_str=f"{in_Newick_tree.rstrip()};",leaf2idx=leaf2idx)
-    #     for in_Newick_tree in in_Newick_trees_1[-nb_trees:]
-    # ]
-    # in_trees_2 = [
-    #     TreeVec(newick_str=f"{in_Newick_tree.rstrip()};",leaf2idx=leaf2idx)
-    #     for in_Newick_tree in in_Newick_trees_2[-nb_trees:]
-    # ]
