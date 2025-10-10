@@ -131,7 +131,7 @@ def GelmanRubin(in_Newick_trees_file_1, in_Newick_trees_file_2, nb_trees, out_fi
             _out_file.write(f"{i},{GR[1][i]},{GR[2][i]}\n")
 
 if __name__ == "__main__":
-    description = "CEDAR: manipulating phylogenetic rooted trees representations as vectors; Gelman RUbin diagnostic tet for MCMC convergence"
+    description = "CEDAR: manipulating phylogenetic rooted trees representations as vectors; Gelman Rubin diagnostic test for MCMC convergence"
 
     argparser = argparse.ArgumentParser(prog="CEDAR-GR", description=description)
     subparsers = argparser.add_subparsers(title="commands", help="command help")
