@@ -109,14 +109,13 @@ def _GelmanRubin(in_TreeVec_trees_1, in_TreeVec_trees_2):
     - in_TreeVec_trees_1.keys() is a range from 0 to number of trees
     - in_TreeVec_trees_2.keys() == in_TreeVec_trees_1.keys()
     - all in_TreeVec_trees_?[i] have the same length
-    - in_TreeVec_trees_?[i] contains encodingof the same tree with different random orders
+    - in_TreeVec_trees_?[i] contains encoding of the same tree with different random leaves orders
     - in_TreeVec_trees_?[i1][j] and in_TreeVec_trees_?[i2][j] are encoded with the same leaves order
     Output:
     - dict(c: dict(i: float) c in [1,2]): entry[c][i] = GelmanRubin value for tree i in chain c  
     """
     nb_trees = len(in_TreeVec_trees_1.keys())
     in_trees = {1: in_TreeVec_trees_1, 2: in_TreeVec_trees_2}
-    
     # GelmanRubin value for tree of rank i in each chain
     GR =  {c: np.zeros(nb_trees) for c in [1,2]}
     for c1 in [1,2]:
@@ -125,12 +124,11 @@ def _GelmanRubin(in_TreeVec_trees_1, in_TreeVec_trees_2):
         squared_distances_within = np.square(__hop_distance_within(in_trees[c1]))
         # squared distances between chain c1 (index 1) and chain c2 (index 2)
         if c1 == 1:
-            c2 = (c1 % 2) + 1
-            squared_distances_between = np.square(__hop_distance_between(in_trees[c1], in_trees[c2]))
+            squared_distances_between = np.square(__hop_distance_between(in_trees[c1], in_trees[(c1%2)+1]))
         else:
             squared_distances_between = np.transpose(squared_distances_between)
         # -- Processing trees of chain c1
-        # sum fom 0 to i of row s of squared_distances_within and squared_distances_between
+        # sum from 0 to i of row s of squared_distances_within and squared_distances_between
         sum_s_within,sum_s_between = {0: np.float64(0.0)},{0: np.float64(0.0)}
         for i in range(1,nb_trees):
             # Processing tree i
@@ -171,19 +169,20 @@ def GelmanRubin(
     - line 1: index<TAB>chain1<TAB>chain2
     - line 2+: <index i><TAB><GR value for tree i in chain 1><TAB><GR value for tree i in chain 2>
     Format of out_orders_file:
-    - line 1: seed<TAB>idex<TAB>order
+    - line 1: seed<TAB>index<TAB>order
     - line 2+: <random generator seed><TAB><order index><TAB><leaves order>
     """
     # Extracting one list of Newick strings from each file; adding a ";" at the end
-    in_Newick_trees = {}
-    in_Newick_trees[1] = read_newick_file(in_Newick_trees_file_1)
-    in_Newick_trees[2] = read_newick_file(in_Newick_trees_file_2)
+    in_Newick_trees = {
+        1: read_newick_file(in_Newick_trees_file_1),
+        2: read_newick_file(in_Newick_trees_file_2)
+    }
     assert len(in_Newick_trees[1])>=nb_trees, "Chain 1 too short"
     assert len(in_Newick_trees[2])>=nb_trees, "Chain 2 too short"
 
     # Generating from each list of Newick strings a structure
-    # dict(int: list(TreeVec)) indexed by number of trees i sme order than in Newick files
-    # and where each list is a list of reeVec objects obtained with a different orde leaves
+    # dict(int: list(TreeVec)) indexed by number of trees in same order than in Newick files
+    # and where each list is a list of TreeVec objects obtained with a different order on leaves
     in_TreeVec_trees = {c: {i: [] for i in range(nb_trees)} for c in [1,2]}
     leaves_orders = []
     rng = np.random.default_rng(random_seed)
@@ -197,8 +196,8 @@ def GelmanRubin(
         for c in [1,2]:
             i = 0
             for in_Newick_tree in in_Newick_trees[c][-nb_trees:]:
-                _tree_1 = TreeVec(newick_str=in_Newick_tree, leaf2idx=leaf2idx)
-                in_TreeVec_trees[c][i].append(_tree_1)
+                _tree = TreeVec(newick_str=in_Newick_tree, leaf2idx=leaf2idx)
+                in_TreeVec_trees[c][i].append(_tree)
                 i += 1
     # Computing Gelman Rubin statistics
     GR = _GelmanRubin(in_TreeVec_trees[1], in_TreeVec_trees[2])
