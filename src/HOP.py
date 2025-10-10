@@ -17,10 +17,10 @@ from LeavesOrder import (
 from TreeVec import (
     TreeVec,
     read_TreeVec_file,
-    write_TreeVec_file
+    write_TreeVec_file,
 )
 
-def __hop_similarity(in_TreeVec_trees, mode="sequence"):
+def __hop_similarity_list(in_TreeVec_trees, mode="sequence"):
     """
     Given a list of TreeVec trees, compute the hop similarity between them
     - in_TreeVec_trees: list(TreeVec) list of TreeVec objects
@@ -62,7 +62,7 @@ def hop_similarity(in_TreeVec_file, out_dist_file, mode="sequence"):
     """
     TreeVec_trees,leaf2idx,idx2leaf = read_treevec_file(in_TreeVec_file)
     # Computing the hop similarity
-    similarity = __hop_similarity(TreeVec_trees, mode=mode)
+    similarity = __hop_similarity_list(TreeVec_trees, mode=mode)
     # Writing the output
     out_str = [
         f"#order {order2str(idx2leaf)}", f"#tree1,tree2,similarity"

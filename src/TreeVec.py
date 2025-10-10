@@ -659,3 +659,8 @@ def write_TreeVec_file(in_TreeVec_trees, idx2leaf, out_TreeVec_file):
             TreeVec_tree.treevec2str(format_str=1, compact=True)
         )
     __write_file(out_str, out_TreeVec_file)
+
+def get_nb_taxa(in_TreeVec_tree):
+    leaf2idx,_ = in_TreeVec_tree.extract_leaves_order()
+    nb_taxa = len(list(leaf2idx.keys()))
+    return nb_taxa

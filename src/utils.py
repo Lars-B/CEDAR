@@ -18,7 +18,8 @@ def __read_file(input_file):
     lines = []
     with open(input_file) as in_file:
         for line in in_file.readlines():
-            lines.append(line.rstrip())
+            if line.strip():
+                lines.append(line.rstrip())
     return lines
 
 def __write_file(in_lines, output_file):
