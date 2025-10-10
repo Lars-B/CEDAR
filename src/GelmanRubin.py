@@ -136,11 +136,11 @@ def _GelmanRubin(in_TreeVec_trees_1, in_TreeVec_trees_2):
             # Processing tree i
             for s in range(i+1):
                 if s == i:
-                    # Computing the sum as index s is seen for the first time
+                    # Computing the sums as index s is seen for the first time
                     sum_s_within[s] = np.sum(squared_distances_within[s][:i+1])
                     sum_s_between[s] = np.sum(squared_distances_between[s][:i+1])
                 else:
-                    # Updating sum_s_* by adding the squaed distance fo (s,i)
+                    # Updating sum_s_* by adding the squared distance for (s,i)
                     sum_s_within[s] += squared_distances_within[s][i]
                     sum_s_between[s] += squared_distances_between[s][i]
                 PSRF = np.sqrt(sum_s_between[s]/sum_s_within[s])
