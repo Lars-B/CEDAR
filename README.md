@@ -162,11 +162,11 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   --nb_orders nb_orders --seed seed \
   --output_gr_file output_file_1 --output_orders_file output_file_2
   ```	
-  Parameters `input_file_1,input_file_2`: Newick files containing the trees of wo parallel MCMC runs.
-  Parameter `nb_trees`: number of trees to consider in the input file; the last trees of bth files are considered, previous trees being discarded as "burn-in" trees.  
-  Parameter `nb_orders`: number of random leaves orders used to compute the distance between pairs of trees; the same ordes are used for all distance computations.
-  Parameter `seed`: seed used for random numbers generation.
-  Parameter `output_file_1`: main output file recording the Gelman-Rubin statistics for the considered trees in TSV format: `<index i>TAB<GR value tree i in chain 1>TAB<GR value tree i in chain 2>`.  
+  Parameters `input_file_1,input_file_2`: Newick files containing the trees of wo parallel MCMC runs.   
+  Parameter `nb_trees`: number of trees to consider in the input file; the last trees of bth files are considered, previous trees being discarded as "burn-in" trees.    
+  Parameter `nb_orders`: number of random leaves orders used to compute the distance between pairs of trees; the same ordes are used for all distance computations.   
+  Parameter `seed`: seed used for random numbers generation.   
+  Parameter `output_file_1`: main output file recording the Gelman-Rubin statistics for the considered trees in TSV format: `<index i>TAB<GR value tree i in chain 1>TAB<GR value tree i in chain 2>`.    
   Parameter `output_file_2`: file recording the random leaves orders.
 
 ## Class TreeVec
