@@ -212,32 +212,3 @@ def GelmanRubin(
         _out_file.write("index\tchain1\tchain2\n")
         for i in range(nb_trees):
             _out_file.write(f"{i}\t{GR[1][i]}\t{GR[2][i]}\n")
-
-if __name__ == "__main__":
-    description = "CEDAR: manipulating phylogenetic rooted trees representations as vectors; Gelman Rubin diagnostic test for MCMC convergence"
-
-    argparser = argparse.ArgumentParser(prog="CEDAR-GR", description=description)
-    subparsers = argparser.add_subparsers(title="commands", help="command help")
-    
-    # Creating Gelman Rubin diagnostic values for two chains
-    GR = subparsers.add_parser("GR", help="Gelman Rubin diagnosic values")
-    GR.set_defaults(cmd="GR")
-    GR.add_argument("--Newick_file_1", type=str, help="Input Newick file 1")
-    GR.add_argument("--Newick_file_2", type=str, help="Input Newick file 2")
-    GR.add_argument("--nb_trees", type=int, help="Number of trees (trail of files to consider)")
-    GR.add_argument("--nb_orders", type=int, help="Number of random leaves orders")
-    GR.add_argument("--random_seed", type=int, help="Random geneator seed")
-    GR.add_argument("--output_gr_file", type=str, help="Output file containing GR statistics")
-    GR.add_argument("--output_orders_file", type=str, help="Output file containing leaves orders")
-    
-    args = argparser.parse_args()
-
-    GelmanRubin(
-        args.Newick_file_1,
-        args.Newick_file_2,
-        args.nb_trees,
-        args.nb_orders,
-        args.random_seed,
-        args.output_gr_file,
-        args.output_orders_file
-    )
