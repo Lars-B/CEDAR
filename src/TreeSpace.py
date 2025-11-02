@@ -117,7 +117,7 @@ def best_ML_neighbour(
     # Isolating liklihood scores in the same order than in ngb_scores_and_hops
     ngb_scores = [ngb_result[1] for ngb_result in ngb_scores_and_hops]
     # Index of the best likelihood score
-    best_score_idx = np.argmax(ngb_scores)
+    best_score_idx = np.argmin(ngb_scores)
     # HOP defining the best tree
     (i,j) = ngb_scores_and_hops[best_score_idx][0]
     # Creating the best tree by perforing the corresponding hop
@@ -194,7 +194,7 @@ def _hill_climbing(
             fasta_path, DNA_model, tree_folder_path,
             iteration_counter, clean_tree
         )
-        if best_ngb_score - current_score > tol:
+        if current_score - best_ngb_score > tol:
             current_tree = best_ngb_tree
             current_score = best_ngb_score
             patience_counter = max_patience
