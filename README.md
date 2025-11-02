@@ -154,7 +154,7 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.  
   The results of `raxml-ng` are stored in folder `tree_folder_path`.
 
-- Gelman-Rubin MCMC convergence statistics:
+- Gelman-Rubin MCMC convergence statistics:  
   Computes the Gelman-Rubin convegence test described in <a href="https://doi.org/10.1109/TCBB.2024.3457875">An Automated Convergence Diagnostic for Phylogenetic MCMC Analyses</a>
   using a distance between pais of trees defined as the minimum HOP distance over a specified number of random leaves orders.
   ```
