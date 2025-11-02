@@ -1,8 +1,8 @@
 Using the last 1000 trees and considering 5 random leves orders to compute distances
 ```
-python ../src/GelmanRubin.py GR --Newick_file_1 ds1-r1.newick --Newick_file_2 ds1-r2.newick --nb_trees 1000 --nb_orders 5 --random_seed 1 --output_gr_file GR_1000.tsv --output_orders_file orders_1000.tsv
+python ../src/CEDAR.py GR --Newick_file_1 ds1-r1.newick --Newick_file_2 ds1-r2.newick --nb_trees 1000 --nb_orders 5 --random_seed 1 --output_gr_file GR_1000.tsv --output_orders_file orders_1000.tsv
 ```
 Using the last 100 trees and considering 3 random leves orders to compute distances
 ```
-python ../src/GelmanRubin.py GR --Newick_file_1 ds1-r1.newick --Newick_file_2 ds1-r2.newick --nb_trees 100 --nb_orders 3 --random_seed 1 --output_gr_file GR_100.tsv --output_orders_file orders_100.tsv
+python ../src/CEDAR.py GR --Newick_file_1 ds1-r1.newick --Newick_file_2 ds1-r2.newick --nb_trees 100 --nb_orders 3 --random_seed 1 --output_gr_file GR_100.tsv --output_orders_file orders_100.tsv
 ```
