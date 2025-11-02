@@ -8,12 +8,14 @@ the paper *"A Vector Representation for Phylogenetic Trees"*.
 CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file 
 [TreeVec.py](src/TreeVec.py).
 
-*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>.
+*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>; <a href="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> for the hill-climbing tree space exploration heuristic.
 
 The directory [example](example/) contains an example of using CEDAR through command-line.
 
 The directory [experiments](experiments) contains the code to reproduce the experiments described in the 
 paper *"A Vector Representation for Phylogenetic Trees"*.
+
+The directory [experiments_hc](experiments_hc) contains the code to reproduce the experiments using the hill-climbing tree space exploration experiments.
 
 ## Vector encoding of phylogenetic trees
 
@@ -173,5 +175,6 @@ The main methods of the class, aside of the constuctor, are:
 - `hop_neighbourhood`: computes the `TreeVec` representations of the trees in the HOP neighbourhood of the tree encoded by the object;
 - `hop_similarity`: computes the HOP similarity or a HOP LCS (see paper for an explanation) with another tree;
 - `hop_next`: creates a tree one HOP closer to a target tree;
-- `random_hop`: peform a uniform random HOP on the current tree.
+- `random_hop`: peform a uniform random HOP on the current tree;
+- `reorder_leaves`: create a new `TreeVec` object fom the current one differing by a random reordering of the leaves.
 

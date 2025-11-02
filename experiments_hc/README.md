@@ -28,7 +28,7 @@ Loading required package: ape
 
 Starting from a random tree, the heuristic iterates the following steps
   - reorder randomly the leaves of the current tree
-  - compute the likelihood of all trees in the HOP neighbourhood of the current tree
+  - compute the likelihood of all trees in the HOP neighbourhood of the current tree, using `raxml-ng` and the GTR model  
   - select the best likelihood tree
   - if its likelihood is within a given tolerance (`0.001`) of the best tree so far:
     - decrease a patience counter [patience step]
