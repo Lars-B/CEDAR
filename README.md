@@ -154,6 +154,20 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.  
   The results of `raxml-ng` are stored in folder `tree_folder_path`.
 
+- Gelman-Rubin MCMC convergence statistics:
+  Computes the Gelman-Rubin convegence test described in <a href="https://doi.org/10.1109/TCBB.2024.3457875">An Automated Convergence Diagnostic for Phylogenetic MCMC Analyses</a>
+  using a distance between pais of trees defined as the minimum HOP distance over a specified number of random leaves orders.
+  ```
+  python src/CEDAR.py GR --Newick_file_1 input_file_1 --Newick_file_2 --nb_trees nb_trees \
+  --nb_orders nb_orders --seed seed \
+  --output_gr_file output_file_1 --output_orders_file output_file_2
+  ```	
+  Parameters `input_file_1,input_file_2`: Newick files containing the trees of wo parallel MCMC runs.
+  Parameter `nb_trees`: number of trees to consider in the input file; the last trees of bth files are considered, previous trees being discarded as "burn-in" trees.  
+  Parameter `nb_orders`: number of random leaves orders used to compute the distance between pairs of trees; the same ordes are used for all distance computations.
+  Parameter `seed`: seed used for random numbers generation.
+  Parameter `output_file_1`: main output file recording the Gelman-Rubin statistics for the considered trees in TSV format: `<index i>TAB<GR value tree i in chain 1>TAB<GR value tree i in chain 2>`.  
+  Parameter `output_file_2`: file recording the random leaves orders.
 
 ## Class TreeVec
 
