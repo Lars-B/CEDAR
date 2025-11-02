@@ -149,7 +149,7 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).  
   Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and has default value `5`.  
   Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least
-  `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.
+  `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.  
   The results of `raxml-ng` are stored in folder `tree_folder_path`.
 
 
