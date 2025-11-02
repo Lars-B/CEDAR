@@ -123,7 +123,7 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   in the same line in the input file.
   Parameter `seed` is the seed of the random generator and has default value `0`.
 
-- Hill-climbig heuristic exploration of the tree space using HOPs:  
+- Hill-climbing heuristic exploration of the tree space using HOPs:  
   starting from a random tree, the heuristic iterates the following steps
   - reorder randomly the leaves of the current tree
   - compute the likelihood of all trees in the HOP neighbourhood of the current tree using <a hef="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> 
