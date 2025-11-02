@@ -30,6 +30,9 @@ from HOP import (
 from TreeSpace import (
     hill_climbing
 )
+from GelmanRubin import (
+    GelmanRubin
+)
 
 def _parse_arguments():
     description = "CEDAR: manipulating phylogenetic rooted trees representations as vectors"
@@ -106,6 +109,17 @@ def _parse_arguments():
     hop_hc.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random number generator seed")
     hop_hc.add_argument("--out_file_path", type=str, help="Path to output file")
 
+    # Gelman Rubin convegence statistics
+    GR = subparsers.add_parser("GR", help="Gelman Rubin diagnostic values")
+    GR.set_defaults(cmd="GR")
+    GR.add_argument("--Newick_file_1", type=str, help="Input Newick file 1")
+    GR.add_argument("--Newick_file_2", type=str, help="Input Newick file 2")
+    GR.add_argument("--nb_trees", type=int, help="Number of trees (tail of Newick files to consider)")
+    GR.add_argument("--nb_orders", type=int, help="Number of random leaves orders")
+    GR.add_argument("--random_seed", type=int, help="Random generator seed")
+    GR.add_argument("--output_gr_file", type=str, help="Output file containing GR statistics")
+    GR.add_argument("--output_orders_file", type=str, help="Output file containing leaves orders")
+
     return argparser.parse_args()
 
 def fromNewick(args):
@@ -170,6 +184,17 @@ def HOP_hc(args):
         args.tol, args.max_patience, args.max_nb_iterations, args.seed,
         args.out_file_path
     )
+
+def GR(args):
+    GelmanRubin(
+        args.Newick_file_1,
+        args.Newick_file_2,
+        args.nb_trees,
+        args.nb_orders,
+        args.random_seed,
+        args.output_gr_file,
+        args.output_orders_file
+    )
     
 def main(args):
     
@@ -199,6 +224,9 @@ def main(args):
 
     elif args.cmd == "HOP_hc":
         HOP_hc(args)
+
+    elif args.cmd == "GR":
+        GR(args)
         
     else:
         raise Exception("ERROR: Unknown command")
