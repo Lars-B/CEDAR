@@ -95,7 +95,7 @@ def _parse_arguments():
     hop_random.set_defaults(cmd="HOP_random")
     hop_random.add_argument("--input_file", type=str, help="Input CEDAR file")
     hop_random.add_argument("--output_file", type=str, help="Output CEDAR file")
-    hop_random.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random generator seed")
+    hop_random.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random number generator seed")
 
     # Hill-Climbing
     hop_hc = subparsers.add_parser("HOP_hc", help="Hill-Climbing heuristic")
