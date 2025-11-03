@@ -1,21 +1,20 @@
 # CEDAR: Encoding phylogenetic trees as vectors
 
-CEDAR is a program aimed at manipulating rooted phylogenetic trees encoded as vecors, as described in
-the paper *"A Vector Representation for Phylogenetic Trees"*.
+CEDAR is a program aimed at manipulating rooted phylogenetic trees encoded as vecors, as described in the paper <a href="https://doi.org/10.1098/rstb.2024.0226">A Vector Representation for Phylogenetic Trees</a>.
 
 **WARNING.** CEDAR is still in development and comes with no warranty.
 
-CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file 
-[TreeVec.py](src/TreeVec.py).
+CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file [TreeVec.py](src/TreeVec.py).
 
 *Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>; <a href="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> for the hill-climbing tree space exploration heuristic.
 
-The directory [example](example/) contains an example of using CEDAR through command-line.
+The folder [example](example/) contains an example of using CEDAR through command-line.
 
-The directory [experiments](experiments) contains the code to reproduce the experiments described in the 
-paper *"A Vector Representation for Phylogenetic Trees"*.
+The folder [experiments](experiments) contains the code to reproduce the experiments described in the  paper <a href="https://doi.org/10.1098/rstb.2024.0226">A Vector Representation for Phylogenetic Trees</a>.
 
-The directory [experiments_hc](experiments_hc) contains the code to reproduce the experiments using the hill-climbing tree space exploration experiments.
+The folder [experiments_hc](experiments_hc) contains the code to reproduce the experiments using the hill-climbing tree space exploration heuristic implemented in CEDAR.  
+
+The folder [experiments_gr](experiments_gr) contains the code to reproduce the experiments using the Gelman-Rubin MCMC convergence statstics implemented in CEDAR.
 
 ## Vector encoding of phylogenetic trees
 
