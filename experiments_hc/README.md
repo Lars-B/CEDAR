@@ -11,14 +11,14 @@ Data is taken from the datasets used in the Phylo2Vec paper, as given in the dat
 - <a href="https://github.com/KlausVigo/phangorn/blob/main/data/yeast.RData">yeast dataset</a> (8 taxa, 127,018nt sequences)  
 
 ```
-> date
+experiments_hc > date
 Thu Oct  2 18:45:45 PDT 2025
-experiments_hc > data > cd data
-experiments_hc > data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/zika/zika.fasta
-experiments_hc > data > wget https://raw.githubusercontent.com/4ment/phylostan/refs/heads/master/examples/fluA/fluA.fa
-experiments_hc > data > mv fluA.fa fluA.fasta
-experiments_hc > data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/h3n2_na/h3n2_na_20.fasta
-experiments_hc > data > R
+experiments_hc > cd data
+data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/zika/zika.fasta
+data > wget https://raw.githubusercontent.com/4ment/phylostan/refs/heads/master/examples/fluA/fluA.fa
+data > mv fluA.fa fluA.fasta
+data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/h3n2_na/h3n2_na_20.fasta
+data > R
 > library(phangorn)
 Loading required package: ape
 > data(yeast)
