@@ -33,12 +33,10 @@ done
 echo "HOP distance between best trees"
 TREES_FILE_TVC=${RES_DIR}/${DATASET}_best_trees.treevec
 python ../src/CEDAR.py fromNewick --input_file ${TREES_FILE_NWK} --output_file ${TREES_FILE_TVC}
-
 HOP_DIST_FILE=${RES_DIR}/${DATASET}_HOP.dist
 python ../src/CEDAR.py HOP_sim --input_file ${TREES_FILE_TVC} --output_file ${HOP_DIST_FILE} --mode pairwise
 
 echo "RF distance between best trees"
-
 RF_DIST_FILE=${RES_DIR}/${DATASET}_RF.dist
 echo "#tree1,tree2,RFdistance" > ${RF_DIST_FILE}
 for i in {1..10}
