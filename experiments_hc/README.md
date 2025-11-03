@@ -4,7 +4,7 @@ This folder contains the scripts and results of experiments on using the hill-cl
 The experiments repeat the analysis of four datasets used in the paper <a href="https://doi.org/10.1093/sysbio/syae030"> Phylo2Vec: A Vector Representation for Binary Trees</a>.
 
 ## Data
-Data is taken from the datasets used in the Phylo2Vec paper, as given in the daaets folder of the Phylo2Vec github repo, <a href="https://github.com/sbhattlab/phylo2vec/tree/main/py-phylo2vec/phylo2vec/datasets/descr">Phylo2Vec datasets</a>:
+Data is taken from the datasets used in the Phylo2Vec paper, as given in the datasets folder of the Phylo2Vec github repo, <a href="https://github.com/sbhattlab/phylo2vec/tree/main/py-phylo2vec/phylo2vec/datasets/descr">Phylo2Vec datasets</a>:
 - <a href="https://github.com/neherlab/treetime_examples/blob/master/data/zika/zika.fasta">Zika dataset</a> (86 taxa, 10,807nt sequences)  
 - <a href="https://github.com/4ment/phylostan/blob/master/examples/fluA/fluA.fa">fluA dataset</a> (69 taxa, 987nt sequences)  
 - <a href="https://github.com/neherlab/treetime_examples/blob/master/data/h3n2_na/h3n2_na_20.fasta">h3n2_na dataset</a> (19 taxa, 1,407nt sequences)  
