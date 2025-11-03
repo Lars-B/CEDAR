@@ -70,10 +70,10 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
 
 - Creating random taxa orders:
   ```
-  python src/CEDAR.py orders --input_file CEDAR_file --output_dir out_dir [--nb_orders N] [--output_prefix out_pref] [--seed seed]
+  python src/CEDAR.py orders --input_file CEDAR_file --output_dir out_dir [--nb_orders N] [--output_prefix out_pref] [--seed random_number_generator_seed]
   ```
   Creates `N` random taxa orders in files `out_dir/out_pref_I.txt` for `I` from `1` to `N`.
-  Parameter `seed` is the seed of the random generator.
+  Parameter `random_number_generator_seed` is the seed of the random generator and has default value `0`.
   Default values: `N=1`, `out_pref=CEDAR_random_order`, `seed=0`.
 
   **Assumption**: in all commands, all trees in a `CEDAR_file` are rooted phylogenetic trees on the same set of taxa
