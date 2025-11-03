@@ -5,7 +5,7 @@ CEDAR: exploration of the tree space in a maximum likelihood framework
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
@@ -16,8 +16,12 @@ import numpy as np
 from Bio import SeqIO
 from ete3 import Tree
 
-from _raxml import raxml_loss
-from TreeVec import TreeVec
+from _raxml import (
+    raxml_loss
+)
+from TreeVec import (
+    TreeVec
+)
 
 def _read_fasta(data_path):
     """

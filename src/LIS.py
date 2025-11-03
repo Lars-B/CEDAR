@@ -6,7 +6,7 @@ Taken from https://leetcode.com/problems/longest-increasing-subsequence/solution
 __author__ = "Cedric Chauve"
 __credits__ = ["Mai Thanh Hiep (https://leetcode.com/u/hiepit/, https://github.com/hiepxuan2008)"]
 __license__ = "GPL"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"

@@ -6,16 +6,21 @@ TreeVec class for vector representation of a tree
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
 
+import numpy as np
 from ete3 import Tree
 from LIS import LIS_len, LIS_seq
 from utils import (
     __read_file,
     __write_file
+)
+from LeavesOrder import (
+    str2order,
+    order2str
 )
 
 # Separator between a label and a node name in a tree representation
@@ -664,3 +669,18 @@ def get_nb_taxa(in_TreeVec_tree):
     leaf2idx,_ = in_TreeVec_tree.extract_leaves_order()
     nb_taxa = len(list(leaf2idx.keys()))
     return nb_taxa
+
+def random_leaves_order(in_TreeVec_file, nb_orders=1, in_seed=0, out_file_prefix="leaves_order"):
+    """
+    Generates nb_orders random leaves orders and write them in files 
+    {out_prefix_file}_{nb order}.txt
+    """
+    _,_,idx2leaf = read_TreeVec_file(in_TreeVec_file)
+    nb_leaves = len(idx2leaf.keys())
+    idx = np.array(list(idx2leaf.values()))
+    rng = np.random.default_rng(in_seed)
+    for i in range(1,nb_orders+1):
+        rng.shuffle(idx)
+        _idx2leaf = {j: idx[j-1] for j in range(1,nb_leaves+1)}
+        with open(f"{out_file_prefix}_{i}.txt", "w") as out_file:
+            out_file.write(f"{order2str(_idx2leaf)}\n")

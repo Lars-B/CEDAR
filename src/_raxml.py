@@ -5,13 +5,23 @@ Adapted from https://github.com/Neclow/phylo2vec/blob/main/py-phylo2vec/phylo2ve
 Accessed on 2025.09.30
 """
 
+__author__ = "Cedric Chauve"
+__credits__ = ["https://github.com/Neclow/phylo2vec/tree/main"]
+__license__ = "GPL"
+__version__ = "1.2.0"
+__maintainer__ = "Cedric Chauve"
+__email__ = "cedric.chauve@sfu.ca"
+__status__ = "Release"
+
 import os
 import re
 import subprocess
 import sys
-
 from pathlib import PurePosixPath
-from TreeVec import TreeVec
+
+from TreeVec import (
+    TreeVec
+)
 
 # Test if the current platform is Windows or not
 IS_WINDOWS = sys.platform.startswith("win")

@@ -6,7 +6,7 @@ Convergence of an MCMC using Gelman Rubin statistics
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
@@ -15,7 +15,7 @@ import argparse
 import numpy as np
 
 from Newick import (
-    read_newick_file
+    read_Newick_file
 )
 from LeavesOrder import (
     order2str
@@ -174,8 +174,8 @@ def GelmanRubin(
     """
     # Extracting one list of Newick strings from each file; adding a ";" at the end
     in_Newick_trees = {
-        1: read_newick_file(in_Newick_trees_file_1),
-        2: read_newick_file(in_Newick_trees_file_2)
+        1: read_Newick_file(in_Newick_trees_file_1),
+        2: read_Newick_file(in_Newick_trees_file_2)
     }
     assert len(in_Newick_trees[1])>=nb_trees, "Chain 1 too short"
     assert len(in_Newick_trees[2])>=nb_trees, "Chain 2 too short"

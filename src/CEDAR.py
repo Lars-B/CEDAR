@@ -5,7 +5,7 @@ CEDAR: manipulating phylogenetic rooted trees representations as vectors
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
@@ -13,7 +13,7 @@ __status__ = "Release"
 import os
 import argparse
 
-from LeavesOrder import (
+from TreeVec import (
     random_leaves_order
 )
 from Newick import (
