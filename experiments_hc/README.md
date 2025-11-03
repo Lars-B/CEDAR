@@ -13,12 +13,12 @@ Data is taken from the datasets used in the Phylo2Vec paper, as given in the dat
 ```
 > date
 Thu Oct  2 18:45:45 PDT 2025
-data > cd data
-data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/zika/zika.fasta
-data > wget https://raw.githubusercontent.com/4ment/phylostan/refs/heads/master/examples/fluA/fluA.fa
-data > mv fluA.fa fluA.fasta
-data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/h3n2_na/h3n2_na_20.fasta
-data > R
+experiments_hc > data > cd data
+experiments_hc > data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/zika/zika.fasta
+experiments_hc > data > wget https://raw.githubusercontent.com/4ment/phylostan/refs/heads/master/examples/fluA/fluA.fa
+experiments_hc > data > mv fluA.fa fluA.fasta
+experiments_hc > data > wget https://raw.githubusercontent.com/neherlab/treetime_examples/refs/heads/master/data/h3n2_na/h3n2_na_20.fasta
+experiments_hc > data > R
 > library(phangorn)
 Loading required package: ape
 > data(yeast)
@@ -43,10 +43,10 @@ until the maximum number of iterations is reached or the patience counter is 0
 
 For each dataset, we run 10 hill-climbing explorations with a random starting tree.
 ```
-sed 's/DATASET/zika/g' run_template.sh > run_zika.sh
-sed 's/DATASET/fluA/g' run_template.sh > run_fluA.sh
-sed 's/DATASET/h3n2_na_20/g' run_template.sh > run_h3n2_na_20.sh
-sed 's/DATASET/yeast/g' run_template.sh > run_yeast.sh
+experiments_hc > sed 's/DATASET/zika/g' run_template.sh > run_zika.sh
+experiments_hc > sed 's/DATASET/fluA/g' run_template.sh > run_fluA.sh
+experiments_hc > sed 's/DATASET/h3n2_na_20/g' run_template.sh > run_h3n2_na_20.sh
+experiments_hc > sed 's/DATASET/yeast/g' run_template.sh > run_yeast.sh
 experiments_hc > sbatch run_zika.sh
 experiments_hc > sbatch run_fluA.sh
 experiments_hc > sbatch run_h3n2_na_20.sh
