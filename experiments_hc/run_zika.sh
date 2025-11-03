@@ -1,15 +1,15 @@
 #!/bin/bash
 #SBATCH --time=36:00:00
 #SBATCH --mem=8G
-#SBATCH --account=def-chauvec
+#SBATCH --account=<HIDDEN>
 #SBATCH --job-name=zika
 #SBATCH --array=1-10
-#SBATCH --output=/scratch/chauvec/CEDAR/CEDAR/experiments_hc/log/zika/zika_%a.out
-#SBATCH --error=/scratch/chauvec/CEDAR/CEDAR/experiments_hc/log/zika/zika_%a.err
+#SBATCH --output=/<HIDDEN>/CEDAR/experiments_hc/log/zika/zika_%a.out
+#SBATCH --error=/<HIDDEN>/CEDAR/experiments_hc/log/zika/zika_%a.err
 
 module load StdEnv/2023  gcc/12.3  openmpi/4.1.5 raxml-ng/1.2.0 python/3.11.5
 
-CEDAR_DIR=/scratch/chauvec/CEDAR/CEDAR
+CEDAR_DIR=/<HIDDEN>/CEDAR
 EXP_DIR=${CEDAR_DIR}/experiments_hc
 
 RES_OUT=${EXP_DIR}/results/zika/zika_${SLURM_ARRAY_TASK_ID}.tsv
