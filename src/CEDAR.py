@@ -115,8 +115,8 @@ def _parse_arguments():
     GR.add_argument("--Newick_file_1", type=str, help="Input Newick file 1")
     GR.add_argument("--Newick_file_2", type=str, help="Input Newick file 2")
     GR.add_argument("--nb_trees", type=int, help="Number of trees (tail of Newick files to consider)")
-    GR.add_argument("--nb_orders", type=int, help="Number of random leaves orders")
-    GR.add_argument("--seed", type=int, help="Random generator seed")
+    GR.add_argument("--nb_orders", type=int, default=5, help="[OPTIONAL] Number of random leaves orders")
+    GR.add_argument("--seed", type=int, default=0, help="[OPTIONAL] Random number generator seed")
     GR.add_argument("--output_gr_file", type=str, help="Output file containing GR statistics")
     GR.add_argument("--output_orders_file", type=str, help="Output file containing leaves orders")
 
