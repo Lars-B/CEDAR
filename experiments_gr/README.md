@@ -16,11 +16,13 @@ The random leaves orders are detemined at the beginning of the process and are t
 For the first experiment, we take the last 1000 trees of each BEAST run and consider 5 random leaves orders for the distance computation:
 ```
 gunzip ds1-r1.newick.gz
+gunzip ds1-r2.newick.gz
 python ../src/CEDAR.py GR \
   --Newick_file_1 ds1-r1.newick --Newick_file_2 ds1-r2.newick \
   --nb_trees 1000 --nb_orders 5 --seed 1 \
   --output_gr_file GR_1000.tsv --output_orders_file orders_1000.tsv
 gzip ds1-r1.newick
+gzip ds1-r2.newick
 ```
 The output files are `GR_1000.tsv` that records the Gelman-Rubin statistic value for each of the 1000 pair of trees from the two BEAST runs
 and `orders_1000.tsv` that recors the 5 random leaves orders (to allow reproducibility of the experiment).
@@ -28,10 +30,12 @@ and `orders_1000.tsv` that recors the 5 random leaves orders (to allow reproduci
 The second experiment is similar to the first one but considers the last 100 trees of each BEAST run and 3 random leaves orders.
 The output files are `GR_100.tsv` and `orders_100.tsv`
 ```
+gunzip ds1-r1.newick.gz
 gunzip ds1-r2.newick.gz
 python ../src/CEDAR.py GR \
   --Newick_file_1 ds1-r1.newick --Newick_file_2 ds1-r2.newick \
   --nb_trees 100 --nb_orders 3 --seed 1 \
   --output_gr_file GR_100.tsv --output_orders_file orders_100.tsv
+gzip ds1-r1.newick
 gzip ds1-r2.newick
 ```
