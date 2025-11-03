@@ -117,11 +117,11 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
 
 - Peforming a random HOP to each tree in a file
   ```
-  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed random number generator seed]
+  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed random_number_generator_seed]
   ```
   Creates a new CEDAR file containing on each line a tree differing by a single random HOP from the tree
   in the same line in the input file.
-  Parameter `seed` is the seed of the random generator and has default value `0`.
+  Parameter `random_number_generator_seed` is the seed of the random generator and has default value `0`.
 
 - Hill-climbing heuristic exploration of the tree space using HOPs:  
   starting from a random tree, the heuristic iterates the following steps
@@ -132,8 +132,9 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
     - decrease a patience counter [patience step]  
   - otherwise:  
     - the best tree becomes the current tree  
-    - the patience counter is set to max_patience  
-  - until the maximum number of iterations is reached or the patience counter is 0
+    - the patience counter is set to max_patience
+    - 
+  until the maximum number of iterations is reached or the patience counter is 0.  
  
   The command `raxml-ng` is assumed to be available in the default path.
 
@@ -141,13 +142,13 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   python src/CEDAR.py HOP_hc --fasta_path FASTA_file --DNA_model DNA_model --tree_folder_path tree_folder_path \
   --out_file_path out_file \
   [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
-  [--seed sandom number generator seed]			     
+  [--seed random_number_generator_seed]			     
   ```	
   All visited trees are recorded in the TSV file `out_file` in format `<S[TART,NEIGHBOUR,REORDER]>TAB<likelihood score>TAB<Newick tree>TAB<TreeVec tree>`  
   where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where
   the leaves order was randomly shuffled.
   Parameter `DNA_model` is a DNA model recognized by `raxml-ng`.  
-  Parameter `seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
+  Parameter `random_number_generator_seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
   Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).  
   Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and has default value `5`.  
   Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least
@@ -158,14 +159,14 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Computes the Gelman-Rubin convegence test described in <a href="https://doi.org/10.1109/TCBB.2024.3457875">An Automated Convergence Diagnostic for Phylogenetic MCMC Analyses</a>
   using a distance between pais of trees defined as the minimum HOP distance over a specified number of random leaves orders.
   ```
-  python src/CEDAR.py GR --Newick_file_1 input_file_1 --Newick_file_2 --nb_trees nb_trees \
-  --nb_orders nb_orders --seed seed \
+  python src/CEDAR.py GR --Newick_file_1 input_file_1 --Newick_file_2 [--nb_trees nb_trees] \
+  --nb_orders nb_orders [--seed random_number_generator_seed] \
   --output_gr_file output_file_1 --output_orders_file output_file_2
   ```	
   Parameters `input_file_1,input_file_2`: Newick files containing the trees of wo parallel MCMC runs.   
   Parameter `nb_trees`: number of trees to consider in the input file; the last trees of bth files are considered, previous trees being discarded as "burn-in" trees.    
-  Parameter `nb_orders`: number of random leaves orders used to compute the distance between pairs of trees; the same ordes are used for all distance computations.   
-  Parameter `seed`: seed used for random numbers generation.   
+  Parameter `nb_orders`: number of random leaves orders used to compute the distance between pairs of trees and has defaut value `5`; the same orders are used for all distance computations.   
+  Parameter `random_number_generator_seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
   Parameter `output_file_1`: main output file recording the Gelman-Rubin statistics for the considered trees in TSV format:
   `<index i>TAB<GR value tree i in chain 1>TAB<GR value tree i in chain 2>`.    
   Parameter `output_file_2`: file recording the random leaves orders.
