@@ -6,14 +6,22 @@ TreeVec class for vector representation of a tree
 __author__ = "Cedric Chauve"
 __credits__ = ["Cedric Chauve", "Louxin Zhang"]
 __license__ = "GPL"
-__version__ = "1.0.1"
+__version__ = "1.2.0"
 __maintainer__ = "Cedric Chauve"
 __email__ = "cedric.chauve@sfu.ca"
 __status__ = "Release"
 
+import numpy as np
 from ete3 import Tree
 from LIS import LIS_len, LIS_seq
-from numpy import random
+from utils import (
+    __read_file,
+    __write_file
+)
+from LeavesOrder import (
+    str2order,
+    order2str
+)
 
 # Separator between a label and a node name in a tree representation
 SEP_NODE = ":"
@@ -71,7 +79,7 @@ class TreeVec:
             treevec_str=None,
             leaf2idx=None,
             idx2leaf=None,
-            format=None,
+            format_str=None,
             compact=None
     ):
         """
@@ -82,12 +90,12 @@ class TreeVec:
         - If newick_str is not None it is created from newick_str using idx2leaf and
           expected in Newick format=1   
         - If treevec_str is not None it is created from treevec_str using idx2leaf and
-          expected in format defined by format and compact
+          expected in format defined by format_str and compact
         - Otherwise an empty vector is created
         - leaf2idx (dict str -> int): leaf name to index in a total order on leaves
           (1-base)
         - idx2leaf (dict int -> str): reverse dictionary
-        - format (int in [1,2])
+        - format_str (int in [1,2])
         - compact (bool)
         """
         self.vector = []
@@ -100,7 +108,7 @@ class TreeVec:
         elif treevec_str is not None:
             self.vector = self.str2treevec(
                 treevec_str, idx2leaf,
-                format=format, compact=compact
+                format_str=format_str, compact=compact
             )
 
     def copy(self):
@@ -193,7 +201,7 @@ class TreeVec:
 
     def tree2treevec(self, tree, leaf2idx=None):
         """
-        Compute the vector representation of a tree with n leaves rom a Tree objet
+        Compute the vector representation of a tree with n leaves from a Tree objet
         Input:
         - t: Tree object with features "name" and "dist" (branch length)
         - leaf2idx: dict(str -> int) leaf name to leaf label
@@ -238,36 +246,36 @@ class TreeVec:
             v += paths[i][::-1] + [[i,leaf.name,leaf.dist,True]]
         return v
     
-    def treevec2str(self, format=1, compact=True):
+    def treevec2str(self, format_str=1, compact=True):
         """
         Transform a tree vector representation into a string in format
-        defined by format (1 or 2) and compact (True or False)
+        defined by format_str (1 or 2) and compact (True or False)
         """
         sep_vec,sep_node = SEP_VEC,SEP_NODE, 
         _,idx2leaf = self.extract_leaves_order()
         out_str = []
         for node in self.vector:
             [label,name,dist,leaf] = node
-            if format == 1 and (not compact):
+            if format_str == 1 and (not compact):
                 out_str.append(f"{label}{sep_node}{name}{sep_node}{dist}")
-            elif format == 2 and (not compact):
+            elif format_str == 2 and (not compact):
                 out_str.append(f"{label}{sep_node}{name}")
-            elif format == 1 and compact and (not leaf):
+            elif format_str == 1 and compact and (not leaf):
                 out_str.append(f"{label}{sep_node}{name}{sep_node}{dist}")
-            elif format == 1 and compact and leaf:
+            elif format_str == 1 and compact and leaf:
                 out_str.append(f"{dist}")
-            elif format == 2 and compact and (not leaf):
+            elif format_str == 2 and compact and (not leaf):
                 out_str.append(f"{label}{sep_node}{name}")
-            elif format == 2 and compact and leaf:
+            elif format_str == 2 and compact and leaf:
                 out_str.append("")
         return f"{sep_vec.join(out_str)};"
 
-    def str2treevec(self, s, idx2leaf, format=1, compact=True):
+    def str2treevec(self, s, idx2leaf, format_str=1, compact=True):
         """
         Reads a tree vector representation from a string s
         Input:
         - s (str): string encoding of a tree vector representation
-        - format (int in [1,2]): expected encoding format
+        - format_str (int in [1,2]): expected encoding format
         - compact (bool): if True, compact writing
         """
         sep_vec,sep_node = SEP_VEC,SEP_NODE
@@ -277,18 +285,18 @@ class TreeVec:
         v,j = [],1
         for node_str in s1:
             node = node_str.split(sep_node)
-            if format == 1 and (not compact):
+            if format_str == 1 and (not compact):
                 label,name,dist = int(node[0]),node[1],float(node[2])
-            elif format == 2 and (not compact):
+            elif format_str == 2 and (not compact):
                 label,name,dist = int(node[0]),node[1],1.0
-            elif format == 1 and compact and len(node) == 3:
+            elif format_str == 1 and compact and len(node) == 3:
                 label,name,dist = int(node[0]),node[1],float(node[2])
-            elif format == 1 and compact and len(node) == 1:
+            elif format_str == 1 and compact and len(node) == 1:
                 label,name,dist = j,idx2leaf[j],float(node[0])
                 j += 1
-            elif format == 2 and compact and len(node) == 2:
+            elif format_str == 2 and compact and len(node) == 2:
                 label,name,dist = int(node[0]),node[1],1.0
-            elif format == 2 and compact and len(node) == 1:
+            elif format_str == 2 and compact and len(node) == 1:
                 label,name,dist = j,idx2leaf[j],1.0
                 j += 1
             leaf = (False if occurrences[label]==0 else True)
@@ -306,13 +314,32 @@ class TreeVec:
 
     def newick2treevec(self, newick_str, leaf2idx=None):
         """
-        Instantiate a vector representaion from a Newick string
+        Instantiate a vector representation from a Newick string
         - leaf2idx: dict(str -> int) leaf name to leaf label
         if None: leaf labels added during a postorder traversal in order of visit.
         """
         tree = Tree(newick_str, format=1)
         return self.tree2treevec(tree, leaf2idx=leaf2idx)
 
+    def reorder_leaves(self, rng):
+        """
+        Reorder the leaves of the current tree randomly
+        Input:
+        - rng (Generator): numpy random numbers generator
+        Output:
+        - TreeVec
+        """
+        leaf2idx,_ = self.extract_leaves_order()
+        leaves_idx = list(leaf2idx.values())
+        leaves_labels = list(leaf2idx.keys())
+        rng.shuffle(leaves_idx)
+        leaf2idx = {
+            leaves_labels[i]: leaves_idx[i]
+            for i in range(len(leaves_idx))
+        }
+        new_tree = TreeVec(tree=self.treevec2tree(), leaf2idx=leaf2idx)
+        return new_tree
+        
     """ Hop-related functions
     A hop is an SPR, so a subtree is pruned then regrafted.
     Not every SPR is a hop as the following restriction applies to hop:
@@ -477,17 +504,17 @@ class TreeVec:
             if not moved_node[3]:
                 k = leafpos[moved_node[0]-1]
                 range_j = list(self._compute_hops_range(i, k, size=False))
-                ngb += range_j if export_list else [
+                ngb += [(i,j) for j in range_j] if export_list else [
                     self.hop(i,j, inplace=False) for j in range_j
                 ]
         return ngb
     
-    def random_hop(self, seed=0, inplace=False):
+    def random_hop(self, rng, inplace=False):
         """
         Computes a new TreeVec representing a tree differing from self by a single random hop
         under the uniform distribution.
         Input:
-        - seed: random generator seed
+        - rng: random numbers generator
         - inplace(bool): If True modifies the curren object, otherwise returns a new object
         Output:
         - TreeVec
@@ -495,7 +522,6 @@ class TreeVec:
         # Number of possible random hops
         hop_ngb_size = self.hop_neighbourhood_size()
         # Index of the hop to apply
-        rng = random.default_rng(seed)
         hop_rank = rng.integers(1,high=hop_ngb_size+1)
         leafpos = self._compute_leaves_positions()
         # Number of possible hops already considered
@@ -615,3 +641,46 @@ class TreeVec:
         while not __equal(y,v1[j]): j+=1
         # Move x after y
         return self.hop(i,j+1, inplace=inplace)
+
+def read_TreeVec_file(in_TreeVec_file):
+    # Reading the TreeVec trees
+    in_TreeVec_trees = __read_file(in_TreeVec_file)
+    # Determining the leaves order
+    leaf2idx,idx2leaf = str2order(in_TreeVec_trees[0].split()[1])
+    # Creating TreeVec objects
+    TreeVec_trees = []
+    for TreeVec_tree in in_TreeVec_trees[1:]:
+        TreeVec_trees.append(
+            TreeVec(
+                treevec_str=TreeVec_tree, idx2leaf=idx2leaf, format_str=1, compact=True
+            )
+        )
+    return TreeVec_trees,leaf2idx,idx2leaf
+
+def write_TreeVec_file(in_TreeVec_trees, idx2leaf, out_TreeVec_file):
+    out_str = [f"#order {order2str(idx2leaf)}"]
+    for TreeVec_tree in in_TreeVec_trees:
+        out_str.append(
+            TreeVec_tree.treevec2str(format_str=1, compact=True)
+        )
+    __write_file(out_str, out_TreeVec_file)
+
+def get_nb_taxa(in_TreeVec_tree):
+    leaf2idx,_ = in_TreeVec_tree.extract_leaves_order()
+    nb_taxa = len(list(leaf2idx.keys()))
+    return nb_taxa
+
+def random_leaves_order(in_TreeVec_file, nb_orders=1, in_seed=0, out_file_prefix="leaves_order"):
+    """
+    Generates nb_orders random leaves orders and write them in files 
+    {out_prefix_file}_{nb order}.txt
+    """
+    _,_,idx2leaf = read_TreeVec_file(in_TreeVec_file)
+    nb_leaves = len(idx2leaf.keys())
+    idx = np.array(list(idx2leaf.values()))
+    rng = np.random.default_rng(in_seed)
+    for i in range(1,nb_orders+1):
+        rng.shuffle(idx)
+        _idx2leaf = {j: idx[j-1] for j in range(1,nb_leaves+1)}
+        with open(f"{out_file_prefix}_{i}.txt", "w") as out_file:
+            out_file.write(f"{order2str(_idx2leaf)}\n")

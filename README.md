@@ -1,19 +1,20 @@
 # CEDAR: Encoding phylogenetic trees as vectors
 
-CEDAR is a program aimed at manipulating rooted phylogenetic trees encoded as vecors, as described in
-the paper *"A Vector Representation for Phylogenetic Trees"*.
+CEDAR is a program aimed at manipulating rooted phylogenetic trees encoded as vecors, as described in the paper <a href="https://doi.org/10.1098/rstb.2024.0226">A Vector Representation for Phylogenetic Trees</a>.
 
 **WARNING.** CEDAR is still in development and comes with no warranty.
 
-CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file 
-[TreeVec.py](src/TreeVec.py).
+CEDAR can be used in command line (described below) or wihin python progams using the class `TreeVec` implemented in the file [TreeVec.py](src/TreeVec.py).
 
-*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>.
+*Dependencies:* <a href="https://numpy.org/">numpy</a> and <a href="http://etetoolkit.org/docs/latest/index.html">ete3</a>; <a href="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> for the hill-climbing tree space exploration heuristic.
 
-The directory [example](example/) contains an example of using CEDAR through command-line.
+The folder [example](example/) contains an example of using CEDAR through command-line.
 
-The directory [experiments](experiments) contains the code to reproduce the experiments described in the 
-paper *"A Vector Representation for Phylogenetic Trees"*.
+The folder [experiments](experiments) contains the code to reproduce the experiments described in the  paper <a href="https://doi.org/10.1098/rstb.2024.0226">A Vector Representation for Phylogenetic Trees</a>.
+
+The folder [experiments_hc](experiments_hc) contains the code to reproduce the experiments using the hill-climbing tree space exploration heuristic implemented in CEDAR.  
+
+The folder [experiments_gr](experiments_gr) contains the code to reproduce the experiments using the Gelman-Rubin MCMC convergence statstics implemented in CEDAR.
 
 ## Vector encoding of phylogenetic trees
 
@@ -68,10 +69,10 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
 
 - Creating random taxa orders:
   ```
-  python src/CEDAR.py orders --input_file CEDAR_file --output_dir out_dir [--nb_orders N] [--output_prefix out_pref] [--seed seed]
+  python src/CEDAR.py orders --input_file CEDAR_file --output_dir out_dir [--nb_orders N] [--output_prefix out_pref] [--seed random_number_generator_seed]
   ```
   Creates `N` random taxa orders in files `out_dir/out_pref_I.txt` for `I` from `1` to `N`.
-  Parameter `seed` is the seed of the random generator.
+  Parameter `random_number_generator_seed` is the seed of the random generator and has default value `0`.
   Default values: `N=1`, `out_pref=CEDAR_random_order`, `seed=0`.
 
   **Assumption**: in all commands, all trees in a `CEDAR_file` are rooted phylogenetic trees on the same set of taxa
@@ -113,13 +114,61 @@ The command-line script is [CEDAR.py](src/CEDAR.py), and allows to perform the f
   Creates a new CEDAR file where a sequence of trees, each differing from the previous one by a single
   HOP, is inserted between all pairs of successive trees in the input file `CEDAR_file`.
 
-- Peforming a random HOP to each tree
+- Peforming a random HOP to each tree in a file
   ```
-  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed seed]
+  python src/CEDAR.py HOP_random --input_file CEDAR_file --output_file CEDAR_path_file [--seed random_number_generator_seed]
   ```
   Creates a new CEDAR file containing on each line a tree differing by a single random HOP from the tree
   in the same line in the input file.
-  Parameter `seed` is the seed of the random generator and has default value `0`.
+  Parameter `random_number_generator_seed` is the seed of the random generator and has default value `0`.
+
+- Hill-climbing heuristic exploration of the tree space using HOPs:  
+  starting from a random tree, the heuristic iterates the following steps
+  - reorder randomly the leaves of the current tree
+  - compute the likelihood of all trees in the HOP neighbourhood of the current tree using <a hef="https://github.com/amkozlov/raxml-ng">RAxML-NG</a> 
+  - select the highest likelihood tree  
+  - if its likelihood is within a given tolerance of the best tree so far:  
+    - decrease a patience counter [patience step]  
+  - otherwise:  
+    - the best tree becomes the current tree  
+    - the patience counter is set to max_patience
+    - 
+  until the maximum number of iterations is reached or the patience counter is 0.  
+ 
+  The command `raxml-ng` is assumed to be available in the default path.
+
+  ```
+  python src/CEDAR.py HOP_hc --fasta_path FASTA_file --DNA_model DNA_model --tree_folder_path tree_folder_path \
+  --out_file_path out_file \
+  [--tol tolerance] [--max_patience] max_nb_patience_steps [--max_nb_iterations max_iter] \
+  [--seed random_number_generator_seed]			     
+  ```	
+  All visited trees are recorded in the TSV file `out_file` in format `<S[TART,NEIGHBOUR,REORDER]>TAB<likelihood score>TAB<Newick tree>TAB<TreeVec tree>`  
+  where `START` indicates the starting tree, `NEIGHBOUR` a step where a better neighbour was found, `REORDER` a patince step where
+  the leaves order was randomly shuffled.
+  Parameter `DNA_model` is a DNA model recognized by `raxml-ng`.  
+  Parameter `random_number_generator_seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
+  Parameter `max_iter` limts the number of iterations and has value default `None` (no limit).  
+  Parameter `max_nb_patience_steps` limits the number of times a patience steps is repeated consecutively and has default value `5`.  
+  Parameter `tolerance` is used to determine if a better neighbour was found (if the likelihood of a neighbour tree is at least
+  `tolerance` larger than the likelihood of the current tree) and has default value `0.001`.  
+  The results of `raxml-ng` are stored in folder `tree_folder_path`.
+
+- Gelman-Rubin MCMC convergence statistics:  
+  Computes the Gelman-Rubin convegence test described in <a href="https://doi.org/10.1109/TCBB.2024.3457875">An Automated Convergence Diagnostic for Phylogenetic MCMC Analyses</a>
+  using a distance between pais of trees defined as the minimum HOP distance over a specified number of random leaves orders.
+  ```
+  python src/CEDAR.py GR --Newick_file_1 input_file_1 --Newick_file_2 [--nb_trees nb_trees] \
+  --nb_orders nb_orders [--seed random_number_generator_seed] \
+  --output_gr_file output_file_1 --output_orders_file output_file_2
+  ```	
+  Parameters `input_file_1,input_file_2`: Newick files containing the trees of wo parallel MCMC runs.   
+  Parameter `nb_trees`: number of trees to consider in the input file; the last trees of bth files are considered, previous trees being discarded as "burn-in" trees.    
+  Parameter `nb_orders`: number of random leaves orders used to compute the distance between pairs of trees and has defaut value `5`; the same orders are used for all distance computations.   
+  Parameter `random_number_generator_seed` is the random seed used to reorder randomly leaves in patience steps and has default value `0`.  
+  Parameter `output_file_1`: main output file recording the Gelman-Rubin statistics for the considered trees in TSV format:
+  `<index i>TAB<GR value tree i in chain 1>TAB<GR value tree i in chain 2>`.    
+  Parameter `output_file_2`: file recording the random leaves orders.
 
 ## Class TreeVec
 
@@ -141,5 +190,6 @@ The main methods of the class, aside of the constuctor, are:
 - `hop_neighbourhood`: computes the `TreeVec` representations of the trees in the HOP neighbourhood of the tree encoded by the object;
 - `hop_similarity`: computes the HOP similarity or a HOP LCS (see paper for an explanation) with another tree;
 - `hop_next`: creates a tree one HOP closer to a target tree;
-- `random_hop`: peform a uniform random HOP on the current tree.
+- `random_hop`: peform a uniform random HOP on the current tree;
+- `reorder_leaves`: create a new `TreeVec` object fom the current one differing by a random reordering of the leaves.
 

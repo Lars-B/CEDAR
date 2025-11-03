@@ -1,0 +1,10 @@
+(((((Sklu:1,Calb:0.5)1:0.5,Scas:3)1:1,Sbay:0.5)1:0.5,Skud:0.5)1:1.5,(Smik:1,(Scer:1,Spar:1)1:0.5)1:0.5)1:2;
+(((((Calb:1,Sklu:2)1:0.5,Scas:1)1:0.5,Sbay:0.5)1:0.5,Skud:1)1:1,((Spar:1,Scer:1)1:1,Smik:1)1:1)1:2;
+((((Calb:0.5,Sklu:1)1:0.5,Scas:3)1:2.5,Sbay:1)1:0.25,(((Spar:1,Scer:1)1:1,Smik:0.5)1:0.5,Skud:1)1:1)1:0.25;
+(((((Spar:1,Scer:1)1:1,Smik:0.5)1:0.5,Skud:1)1:1,Sbay:1)1:2,(Scas:1,(Sklu:2,Calb:1)1:0.5)1:0.5)1:1;
+(((((Skud:1,((Spar:1,Scer:1)1:1,Smik:0.5)1:0.5)1:1,Sbay:1)1:1,Scas:1)1:2,Sklu:2)1:0.5,Calb:1)1:0.5;
+((((Sklu:1,Calb:0.5)1:0.25,Scas:1)1:0.125,Sbay:1)1:0.125,(((Spar:1,Scer:1)1:1,Smik:1)1:2,Skud:4)1:0.5)1:0.5;
+((((Smik:2,(Scer:1,Spar:1)1:1)1:0.5,Skud:0.5)1:0.5,((Sklu:1,Calb:1)1:1,Scas:2)1:1)1:0.5,Sbay:1.5)1:0.5;
+((((Smik:1.5,(Scer:1,Spar:1)1:1)1:0.25,Skud:1)1:0.25,Sbay:1)1:1,((Calb:1,Sklu:1)1:1,Scas:0.5)1:0.5)1:3;
+(((((((Spar:1,Scer:1)1:1,Smik:0.5)1:0.5,Skud:1)1:1,Sbay:1)1:1,Scas:1)1:1,Sklu:1)1:1,Calb:1)1:2;
+((((Scer:1,Spar:1)1:1,Smik:1)1:1,Skud:1)1:1,(((Sklu:2,Calb:1)1:0.5,Scas:1)1:0.5,Sbay:0.5)1:0.5)1:2;
